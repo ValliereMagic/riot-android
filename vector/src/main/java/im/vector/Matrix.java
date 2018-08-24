@@ -694,6 +694,7 @@ public class Matrix {
         dataHandler.addListener(VectorApp.getInstance().getDecryptionFailureTracker());
 
         session.setUseDataSaveMode(PreferencesManager.useDataSaveMode(context));
+        session.setUseLazyLoading(PreferencesManager.useLazyLoading(context));
 
         dataHandler.addListener(new MXEventListener() {
             @Override
