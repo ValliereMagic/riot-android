@@ -379,7 +379,6 @@ public class VectorRoomSettingsFragment extends PreferenceFragment implements Sh
                             .setPositiveButton(R.string.leave, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
                                     displayLoadingView();
 
                                     mRoom.leave(new ApiCallback<Void>() {
@@ -425,12 +424,7 @@ public class VectorRoomSettingsFragment extends PreferenceFragment implements Sh
 
                                 }
                             })
-                            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            })
+                            .setNegativeButton(R.string.cancel, null)
                             .show();
                     return true;
                 }
@@ -1613,12 +1607,7 @@ public class VectorRoomSettingsFragment extends PreferenceFragment implements Sh
                                     mRoom.updateCanonicalAlias(null, mAliasUpdatesCallback);
                                 }
                             })
-                            .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // nothing
-                                }
-                            })
+                            .setNegativeButton(R.string.no, null)
                             .show();
                 } else if (item.getItemId() == R.id.ic_action_vector_set_as_main_address) {
                     displayLoadingView();
@@ -1937,9 +1926,8 @@ public class VectorRoomSettingsFragment extends PreferenceFragment implements Sh
                                     .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-
                                             displayLoadingView();
+
                                             mRoom.enableEncryptionWithAlgorithm(MXCryptoAlgorithms.MXCRYPTO_ALGORITHM_MEGOLM, new ApiCallback<Void>() {
 
                                                 private void onDone() {
@@ -1973,7 +1961,6 @@ public class VectorRoomSettingsFragment extends PreferenceFragment implements Sh
                                     .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
                                             encryptSwitchPreference.setChecked(false);
                                         }
                                     })

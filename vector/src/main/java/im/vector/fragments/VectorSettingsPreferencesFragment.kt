@@ -54,7 +54,6 @@ import im.vector.R
 import im.vector.VectorApp
 import im.vector.activity.*
 import im.vector.contacts.ContactsManager
-import im.vector.gcm.GcmRegistrationManager
 import im.vector.preference.*
 import im.vector.settings.FontScale
 import im.vector.util.*
@@ -450,12 +449,20 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
                     displayLoadingView()
 
                     Matrix.getInstance(activity)!!.sharedGCMRegistrationManager
-                            .forceSessionsRegistration(object : GcmRegistrationManager.ThirdPartyRegistrationListener {
-                                override fun onSuccess() {
+                            .forceSessionsRegistration(object : ApiCallback<Void> {
+                                override fun onSuccess(info: Void?) {
                                     hideLoadingView()
                                 }
 
-                                override fun onError() {
+                                override fun onMatrixError(e: MatrixError?) {
+                                    hideLoadingView()
+                                }
+
+                                override fun onNetworkError(e: java.lang.Exception?) {
+                                    hideLoadingView()
+                                }
+
+                                override fun onUnexpectedError(e: java.lang.Exception?) {
                                     hideLoadingView()
                                 }
                             })
@@ -488,16 +495,13 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
                 if (TextUtils.isEmpty(mSession.credentials.deviceId)) {
                     AlertDialog.Builder(activity)
                             .setMessage(R.string.room_settings_labs_end_to_end_warnings)
-                            .setPositiveButton(R.string.logout) { dialog, _ ->
-                                dialog.dismiss()
+                            .setPositiveButton(R.string.logout) { _, _ ->
                                 CommonActivityUtils.logout(activity)
                             }
-                            .setNegativeButton(R.string.cancel) { dialog, _ ->
-                                dialog.dismiss()
+                            .setNegativeButton(R.string.cancel) { _, _ ->
                                 useCryptoPref.isChecked = false
                             }
-                            .setOnCancelListener { dialog ->
-                                dialog.dismiss()
+                            .setOnCancelListener { _ ->
                                 useCryptoPref.isChecked = false
                             }
                             .show()
@@ -846,7 +850,7 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
 
             Matrix.getInstance(context)!!
                     .sharedGCMRegistrationManager
-                    .refreshPushersList(Matrix.getInstance(context)!!.sessions, object : SimpleApiCallback<Void>() {
+                    .refreshPushersList(Matrix.getInstance(context)!!.sessions, object : SimpleApiCallback<Void>(activity) {
                         override fun onSuccess(info: Void?) {
                             refreshPushersList()
                         }
@@ -1137,7 +1141,7 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
             // when using GCM
             // need to register on servers
             if (isConnected && gcmMgr.useGCM() && (gcmMgr.isServerRegistered || gcmMgr.isServerUnRegistered)) {
-                val listener = object : GcmRegistrationManager.ThirdPartyRegistrationListener {
+                val listener = object : ApiCallback<Void> {
 
                     private fun onDone() {
                         if (null != activity) {
@@ -1148,11 +1152,23 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
                         }
                     }
 
-                    override fun onSuccess() {
+                    override fun onSuccess(info: Void?) {
                         onDone()
                     }
 
-                    override fun onError() {
+                    override fun onMatrixError(e: MatrixError?) {
+                        // Set again the previous state
+                        gcmMgr.setDeviceNotificationsAllowed(isAllowed)
+                        onDone()
+                    }
+
+                    override fun onNetworkError(e: java.lang.Exception?) {
+                        // Set again the previous state
+                        gcmMgr.setDeviceNotificationsAllowed(isAllowed)
+                        onDone()
+                    }
+
+                    override fun onUnexpectedError(e: java.lang.Exception?) {
                         // Set again the previous state
                         gcmMgr.setDeviceNotificationsAllowed(isAllowed)
                         onDone()
@@ -1420,9 +1436,7 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
         AlertDialog.Builder(activity)
                 .setTitle(R.string.dialog_title_confirmation)
                 .setMessage(dialogMessage)
-                .setPositiveButton(R.string.remove) { dialog, _ ->
-                    dialog.dismiss()
-
+                .setPositiveButton(R.string.remove) { _, _ ->
                     displayLoadingView()
 
                     mSession.myUser.delete3Pid(pid, object : ApiCallback<Void> {
@@ -1447,7 +1461,7 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
                         }
                     })
                 }
-                .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
+                .setNegativeButton(R.string.cancel, null)
                 .show()
     }
 
@@ -1484,9 +1498,7 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
                 preference.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                     AlertDialog.Builder(activity)
                             .setMessage(getString(R.string.settings_unignore_user, userId))
-                            .setPositiveButton(R.string.yes) { dialog, _ ->
-                                dialog.dismiss()
-
+                            .setPositiveButton(R.string.yes) { _, _ ->
                                 displayLoadingView()
 
                                 val idsList = ArrayList<String>()
@@ -1510,7 +1522,7 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
                                     }
                                 })
                             }
-                            .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
+                            .setNegativeButton(R.string.no, null)
                             .show()
 
                     false
@@ -1570,9 +1582,7 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
                             AlertDialog.Builder(activity)
                                     .setTitle(R.string.dialog_title_confirmation)
                                     .setMessage(R.string.settings_delete_notification_targets_confirmation)
-                                    .setPositiveButton(R.string.remove) { dialog, _ ->
-                                        dialog.dismiss()
-
+                                    .setPositiveButton(R.string.remove) { _, _ ->
                                         displayLoadingView()
                                         gcmRegistrationManager.unregister(mSession, pusher, object : ApiCallback<Void> {
                                             override fun onSuccess(info: Void?) {
@@ -1593,7 +1603,7 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
                                             }
                                         })
                                     }
-                                    .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
+                                    .setNegativeButton(R.string.cancel, null)
                                     .show()
                             true
                         }
@@ -1752,8 +1762,7 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
         AlertDialog.Builder(activity)
                 .setTitle(R.string.account_email_validation_title)
                 .setMessage(R.string.account_email_validation_message)
-                .setPositiveButton(R.string._continue) { dialog, _ ->
-                    dialog.dismiss()
+                .setPositiveButton(R.string._continue) { _, _ ->
                     mSession.myUser.add3Pid(pid, true, object : ApiCallback<Void> {
                         override fun onSuccess(info: Void?) {
                             if (null != activity) {
@@ -1786,8 +1795,7 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
                         }
                     })
                 }
-                .setNegativeButton(R.string.cancel) { dialog, _ ->
-                    dialog.dismiss()
+                .setNegativeButton(R.string.cancel) { _, _ ->
                     hideLoadingView()
                 }
                 .show()
@@ -1936,8 +1944,8 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
         val dialog = AlertDialog.Builder(activity)
                 .setTitle(R.string.font_size)
                 .setView(layout)
-                .setPositiveButton(R.string.ok) { _, _ -> }
-                .setNegativeButton(R.string.cancel) { _, _ -> }
+                .setPositiveButton(R.string.ok, null)
+                .setNegativeButton(R.string.cancel, null)
                 .show()
 
         val linearLayout = layout.findViewById<LinearLayout>(R.id.text_selection_group_view)
@@ -2321,7 +2329,7 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
                 builder.setNegativeButton(R.string.delete) { _, _ -> displayDeviceDeletionDialog(aDeviceInfo) }
             }
 
-            builder.setNeutralButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
+            builder.setNeutralButton(R.string.cancel, null)
                     .setOnKeyListener(DialogInterface.OnKeyListener { dialog, keyCode, event ->
                         if (event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
                             dialog.cancel()
@@ -2385,7 +2393,7 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
                         }
                     })
                 }
-                .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
+                .setNegativeButton(R.string.cancel, null)
                 .show()
     }
 
@@ -2449,8 +2457,7 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
                             mAccountPassword = passwordEditText.text.toString()
                             deleteDevice(aDeviceInfoToDelete.device_id)
                         })
-                        .setNegativeButton(R.string.cancel) { dialog, _ ->
-                            dialog.dismiss()
+                        .setNegativeButton(R.string.cancel) { _, _ ->
                             hideLoadingView()
                         }
                         .setOnKeyListener(DialogInterface.OnKeyListener { dialog, keyCode, event ->
@@ -2509,9 +2516,12 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
 
                 CommonActivityUtils.exportKeys(mSession, passPhrase1EditText.text.toString(), object : ApiCallback<String> {
                     override fun onSuccess(filename: String) {
-                        VectorApp.getInstance().toast(filename)
-
                         hideLoadingView()
+
+                        AlertDialog.Builder(activity)
+                                .setMessage(getString(R.string.encryption_export_saved_as, filename))
+                                .setPositiveButton(R.string.ok, null)
+                                .show()
                     }
 
                     override fun onNetworkError(e: Exception) {
@@ -2537,12 +2547,7 @@ class VectorSettingsPreferencesFragment : PreferenceFragment(), SharedPreference
      */
     @SuppressLint("NewApi")
     private fun importKeys() {
-        val fileIntent = Intent(Intent.ACTION_GET_CONTENT)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            fileIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false)
-        }
-        fileIntent.type = "*/*"
-        startActivityForResult(fileIntent, REQUEST_E2E_FILE_REQUEST_CODE)
+        openFileSelection(activity, this, false, REQUEST_E2E_FILE_REQUEST_CODE)
     }
 
     /**
