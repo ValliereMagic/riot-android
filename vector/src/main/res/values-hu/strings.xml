@@ -254,7 +254,7 @@ Kérlek engedélyezd a hozzáférést a következő felugró ablakban, hogy tudj
 
 Engedélyezed Riot-nak a hozzáférést kapcsolataidhoz?</string>
 
-    <string name="permissions_action_not_performed_missing_permissions">Elnézést... A művelet nem lett végre hajtva hiányzó engedélyek miatt</string>
+    <string name="permissions_action_not_performed_missing_permissions">Elnézést… A művelet nem lett végre hajtva hiányzó engedélyek miatt</string>
 
     <string name="media_slider_saved">Mentve</string>
     <string name="media_slider_saved_message">Mentés a letöltések közé</string>
@@ -345,7 +345,6 @@ Biztos vagy benne?</string>
     <string name="room_delete_unsent_messages">El nem küldött üzenetek törlése</string>
     <string name="room_message_file_not_found">Fájl nem található</string>
     <string name="room_do_not_have_permission_to_post">Nincs engedélyed hogy üzenetet hagyj ebbe a szobában</string>
-    <string name="room_new_message_notification">1 új üzenet</string>
 
     <string name="ssl_trust">Megbízom benne</string>
     <string name="ssl_do_not_trust">Nem bízom meg benne</string>
@@ -357,8 +356,7 @@ Biztos vagy benne?</string>
     <string name="ssl_cert_new_account_expl">Ha a szerver adminisztrátora szerint ez várható volt, akkor bizonyosodj meg róla, hogy az alábbi ujjlenyomat megegyezik a tőle kapottal.</string>
     <string name="ssl_unexpected_existing_expl">A tanúsítvány eltér attól, amit a telefonoddal megbízhatónak jelöltél. Ez RENDKÍVÜL SZOKATLAN. Javasoljuk, hogy NE FOGADD EL ezt az új tanúsítványt.</string>
     <string name="ssl_expected_existing_expl">Egy korábban megbízhatónak jelölt tanúsítvány megváltozott. Lehet, hogy a szerver frissítette a tanúsítványát. Lépj kapcsolatba a szerver adminisztrátorával és egyeztesd az ujjlenyomatot.</string>
-    <string name="ssl_only_accept">CSAK AKKOR fogadd el a tanúsítványt, ha a szerver adminisztrátortól kapott ujjlenyomat megegyezik a fentivel.</string>
-    <string name="ssl_fingerprint_example">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</string>
+    <string name="ssl_only_accept">Csak akkor fogadd el a tanúsítványt, ha a szerver adminisztrátortól kapott ujjlenyomat megegyezik a fentivel.</string>
 
     <string name="room_details_title">Szoba adatai</string>
     <string name="room_details_people">Résztvevők</string>
@@ -374,11 +372,6 @@ Biztos vagy benne?</string>
 Vedd figyelembe, hogy az alkalmazás újraindul  ami sok időt vehet igénybe."</string>
     <string name="room_event_action_cancel_upload">Feltöltés megszakítása</string>
     <string name="room_event_action_cancel_download">Letöltés megszakítása</string>
-
-    <string name="room_displayname_invite_from">%s meghívott</string>
-    <string name="room_displayname_room_invite">Meghívó egy szobába</string>
-    <string name="room_displayname_two_members">%1$s és %2$s</string>
-    <string name="room_displayname_no_title">Üres szoba</string>
 
     <string name="search_hint">Keresés</string>
     <string name="search_members_hint">Szobatagok szűrése</string>
@@ -401,7 +394,7 @@ Vedd figyelembe, hogy az alkalmazás újraindul  ami sok időt vehet igénybe."<
     <string name="room_recents_join_room_prompt">Írd be a szoba azonosítóját vagy nevét</string>
 
     <string name="directory_search_results_title">Könyvtár böngészése</string>
-    <string name="directory_searching_title">Könyvtár keresése...</string>
+    <string name="directory_searching_title">Könyvtár keresése…</string>
 
     <string name="room_settings_favourite">Kedvenc</string>
     <string name="room_settings_de_prioritize">Prioritás csökkentése</string>
@@ -470,7 +463,6 @@ Vedd figyelembe, hogy az alkalmazás újraindul  ami sok időt vehet igénybe."<
     <string name="devices_details_device_name">Készüléknév</string>
     <string name="devices_details_last_seen_title">Legutóbb láttuk</string>
     <string name="devices_details_last_seen_format">%1$s @ %2$s</string>
-    <string name="devices_details_time_format">HH:mm:ss</string>
     <string name="devices_delete_dialog_text">Ez a művelethez újra azonosításra van szükség.
 A folytatáshoz írd be a jelszavad.</string>
     <string name="devices_delete_dialog_title">Azonosítás</string>
@@ -487,8 +479,8 @@ A folytatáshoz írd be a jelszavad.</string>
 
     <string name="settings_change_password">Jelszó megváltoztatása</string>
     <string name="settings_old_password">Régi jelszó</string>
-    <string name="settings_new_password">új jelszó</string>
-    <string name="settings_confirm_password">ellenőrizd a jelszavad</string>
+    <string name="settings_new_password">Új jelszó</string>
+    <string name="settings_confirm_password">Ellenőrizd a jelszavad</string>
     <string name="settings_fail_to_update_password">Jelszó frissítése sikertelen</string>
     <string name="settings_password_updated">A jelszavad sikeresen frissítésre került</string>
     <string name="settings_unignore_user">"Az összes üzenet mutatása %s -tól/-től?
@@ -521,9 +513,6 @@ Vedd figyelembe, hogy az alkalmazás újraindul  ami sok időt vehet igénybe."<
     <string name="room_settings_tag_pref_entry_low_priority">Alacsony prioritású</string>
     <string name="room_settings_tag_pref_entry_none">Semmi</string>
     <string name="room_settings_tag_pref_no_tag">nem címkézett</string>
-    <string name="room_settings_tag_pref_entry_value_favourite">kedvenc</string>
-    <string name="room_settings_tag_pref_entry_value_low_priority">alacsony</string>
-    <string name="room_settings_tag_pref_entry_value_none">semmi</string>
 
     <string name="room_settings_category_access_visibility_title">Hozzáférés és láthatóság</string>
     <string name="room_settings_directory_visibility">Listázza ezt a szobát a szobák könyvtárba</string>
@@ -560,7 +549,7 @@ Vedd figyelembe, hogy az alkalmazás újraindul  ami sok időt vehet igénybe."<
 
     <string name="room_settings_addresses_invalid_format_dialog_title">Helytelen fedőnév formátum</string>
     <string name="room_settings_addresses_invalid_format_dialog_body">\'%s\' nem egy helyes formátum egy fedőnévnek</string>
-    <string name="room_settings_addresses_disable_main_address_prompt_msg">Nem lesz fő címed megadva. Az alapértelmezett fő cím ennek a szobának véletlenszerűen lesz kiválasztva</string>
+    <string name="room_settings_addresses_disable_main_address_prompt_msg">Nem lesz elsődleges címe a szobának.</string>
     <string name="room_settings_addresses_disable_main_address_prompt_title">Fő cím figyelmeztetések</string>
 
     <string name="room_settings_set_main_address">Fő címnek állítás</string>
@@ -607,9 +596,11 @@ A titkosított üzenetek nem fognak látszódni azokon a klienseken ahol a titko
     <string name="encryption_export_room_keys">Szoba kulcsok exportálása</string>
     <string name="encryption_export_room_keys_summary">Exportáld a kulcsokat helyi fájlba</string>
     <string name="encryption_export_export">Exportálás</string>
-    <string name="encryption_export_enter_passphrase">Írj be jelmondatot</string>
+    <string name="encryption_import_enter_passphrase">Írj be jelmondatot</string>
     <string name="encryption_export_confirm_passphrase">Ellenőrizd a jelmondatot</string>
-    <string name="encryption_export_saved_as">A E2E szoba kulcsok el lettek mentve ide \'%s\'</string>
+    <string name="encryption_export_saved_as">A E2E szoba kulcsok el lettek mentve ide \'%s\'
+
+Figyelmeztetés: ez a fájl törlésre kerülhet, ha az alkalmazást törli.</string>
 
     <string name="encryption_import_e2e_room_keys">E2E szoba kulcsok importálása</string>
     <string name="encryption_import_room_keys">Szoba kulcsok importálása</string>
@@ -632,9 +623,7 @@ A titkosított üzenetek nem fognak látszódni azokon a klienseken ahol a titko
 
     <string name="encryption_information_verify_device">Eszköz hitelesítése</string>
     <string name="encryption_information_verify_device_warning">Hogy ellenőrizni lehessen, hogy ez az eszköz megbízható, kérlek használj más kommunikáció módot a tulajdonossal (pl.: személyesen vagy telefonon keresztül) és kérdezd meg hogy a kulcs amit lát a Felhasználói Beállítások alatt megegyezik-e az alábbi kulccsal:</string>
-    <string name="encryption_information_verify_device_warning2">Ha egyezik, nyomja meg a hitelesítés gombot.
-Ha nem, akkor valaki más elfogta ezt az eszközt és érdemes lenne tiltólistára tenni.
-A jövőben ez a hitelesítési mód kényelmesebbé lesz téve.</string>
+    <string name="encryption_information_verify_device_warning2">Ha egyezik, nyomja meg a hitelesítés gombot. Ha nem, akkor valaki más elfogta ezt az eszközt és érdemes lenne tiltólistára tenni. A jövőben ez a hitelesítési mód kényelmesebbé lesz téve.</string>
     <string name="encryption_information_verify_key_match">Hitelesítem, hogy a kulcsok egyeznek</string>
 
     <string name="e2e_enabling_on_app_update">Mostantól a Riot támogatja a végtől végig titkosítást de előtte újra be kell jelentkezned, hogy bekapcsold.
@@ -722,9 +711,8 @@ Ismeretlen eszközök:</string>
     <string name="widget_integration_missing_room_id">Hiányzó szoba azonosító a kérésben.</string>
     <string name="widget_integration_missing_user_id">Hiányzó felhasználó azonosító a kérésben.</string>
     <string name="widget_integration_room_not_visible">%s szoba nem látható.</string>
-    <string name="settings_labs_matrix_apps">Matrix Alkalmazások</string>
     <string name="room_add_matrix_apps">Matrix alkalmazás hozzáadása</string>
-    <string name="notification_listen_for_events">Események figyelése</string>
+    <string name="notification_listening_for_events">Események figyelése</string>
 
     <string name="notification_sync_in_progress">Szinkronizálás</string>
     <string name="call">Hívás</string>
@@ -743,9 +731,6 @@ Ismeretlen eszközök:</string>
     <string name="option_take_video">Videófelvétel</string>
 
     <string name="settings_analytics">Elemzés</string>
-    <string name="settings_opt_out_of_analytics">Analitikai adatgyűjtés kikapcsolása</string>
-    <string name="settings_opt_out_of_analytics_summary">A Riot névtelen elemzést gyűjt az alkalmazás fejlesztésének érdekében.</string>
-
 
     <string name="settings_labs_native_camera">Beépített kamera használata</string>
 
@@ -768,7 +753,7 @@ Ismeretlen eszközök:</string>
 
 <string name="title_activity_group_details">A közösség adatai</string>
 
-    <string name="loading">Betöltés...</string>
+    <string name="loading">Betöltés…</string>
 
     <string name="action_exit">Kilépés</string>
     <string name="bottom_action_groups">Közösségek</string>
@@ -842,7 +827,7 @@ Ismeretlen eszközök:</string>
 
     <string name="list_members">Tagok listázása</string>
     <string name="open_chat_header">Fejléc megnyitása</string>
-    <string name="room_sync_in_progress">Szinkronizálás...</string>
+    <string name="room_sync_in_progress">Szinkronizálás…</string>
     <plurals name="room_header_active_members_count">
 	<item quantity="one">1 aktív tag</item>
 	<item quantity="other">%d aktív tag</item>
@@ -854,12 +839,6 @@ Ismeretlen eszközök:</string>
     <plurals name="room_new_messages_notification">
 	<item quantity="one">1 új üzenet</item>
 	<item quantity="other">%d új üzenet</item>
-</plurals>
-
-    <string name="room_displayname_many_members">%1$s és %2$s</string>
-    <plurals name="others">
-	<item quantity="one">1 másik</item>
-	<item quantity="other">%d másik</item>
 </plurals>
 
     <plurals name="directory_search_rooms">
@@ -899,7 +878,7 @@ Ismeretlen eszközök:</string>
     <string name="settings_notification_privacy_power_saving">Akkumulátor kímélő beállítások</string>
     <string name="settings_notification_privacy_low_detail">Értesítések kevés részlettel</string>
     <string name="settings_notification_privacy_no_permission">Az alkalmazásnak <b>nincs</b> szüksége engedélyre a háttérben való futáshoz</string>
-    <string name="settings_notification_privacy_gcm">• Az értesítések a Google Cloud Messaging rendszeren keresztül lesznek elküldve</string>
+    <string name="settings_notification_privacy_fcm">• Az értesítések a Google Cloud Messaging rendszeren keresztül lesznek elküldve</string>
     <string name="settings_notification_privacy_metadata">• Az értesítések csak metaadatokat tartalmaznak</string>
     <string name="settings_notification_privacy_secure_message_content">• Az értesítés tartalma <b>közvetlenül a Matrix szerverről kerül letöltésre</b></string>
     <string name="settings_notification_privacy_nosecure_message_content">Az értesítések <b>meta- és üzenet adatot is</b> tartalmaznak</string>
@@ -1049,5 +1028,32 @@ Vedd figyelembe, hogy az alkalmazás újraindul ami sok időt vehet igénybe.</s
 
     <string name="resource_limit_soft_contact">Kérlek %s, hogy ez a korlát megemelésre kerüljön.</string>
     <string name="resource_limit_hard_contact">Kérlek %s, hogy tovább tudd használni ezt a szolgáltatást.</string>
+
+<string name="dialog_title_error">Hiba</string>
+
+    <string name="settings_lazy_loading_title">Szoba tagság késleltetett betöltése</string>
+    <string name="settings_lazy_loading_description">Teljesítmény növelése a szoba tagjainak késleltetett betöltésével</string>
+    <string name="error_lazy_loading_not_supported_by_home_server">A Matrix szervered jelenleg nem támogatja a szoba tagság késleltetett betöltését. Próbáld meg később.</string>
+
+    <string name="unknown_error">Ne haragudj, hiba történt</string>
+
+<string name="status_theme">Status.im téma</string>
+
+    <string name="room_sliding_menu_version_x">Verzió: %s</string>
+    <string name="encryption_export_notice">Adj meg egy jelmondatot a kimentett kulcsok titkosításához. Ezt a jelmondatot kell majd megadnod a kulcsok betöltéséhez.</string>
+    <string name="encryption_export_create_passphrase">Jelmondat lekészítése</string>
+    <string name="encryption_export_passphrase_dont_match">A jelmondatoknak meg kell egyezniük</string>
+    <string name="merged_events_expand">kinyit</string>
+    <string name="merged_events_collapse">bezár</string>
+
+<string name="settings_info_area_show">Mutasd az információs részt</string>
+    <string name="show_info_area_always">Mindig</string>
+    <string name="show_info_area_messages_and_errors">Üzenetekhez és hibákhoz</string>
+    <string name="show_info_area_only_errors">Csak hibákhoz</string>
+
+    <string name="generic_label">%1$s:</string>
+    <string name="generic_label_and_value">%1$s: %2$s</string>
+    <string name="plus_x">+%d</string>
+    <string name="x_plus">%d+</string>
 
 </resources>

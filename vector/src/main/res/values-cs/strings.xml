@@ -8,7 +8,7 @@
     <string name="title_activity_settings">Nastavení</string>
     <string name="ok">OK</string>
     <string name="save">Uložit</string>
-    <string name="loading">Načítání...</string>
+    <string name="loading">Načítání…</string>
 
     <string name="cancel">Zrušit</string>
     <string name="send">Odeslat</string>
@@ -38,7 +38,7 @@
     <string name="title_activity_historical">Historický</string>
     <string name="title_activity_group_details">Detail komunity</string>
 
-    <string name="notification_listen_for_events">Naslouchat událostem</string>
+    <string name="notification_listening_for_events">Naslouchat událostem</string>
     <string name="resend">Poslat znovu</string>
     <string name="redact">Redigovat</string>
     <string name="quote">Citovat</string>

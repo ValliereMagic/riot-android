@@ -45,7 +45,6 @@ import com.google.gson.JsonObject;
 import org.matrix.androidsdk.MXSession;
 import org.matrix.androidsdk.adapters.MessageRow;
 import org.matrix.androidsdk.data.Room;
-import org.matrix.androidsdk.data.RoomState;
 import org.matrix.androidsdk.data.store.IMXStore;
 import org.matrix.androidsdk.rest.callback.ApiCallback;
 import org.matrix.androidsdk.rest.model.Event;
@@ -74,12 +73,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import im.vector.R;
-import im.vector.VectorApp;
 import im.vector.listeners.IMessagesAdapterActionsListener;
+import im.vector.settings.VectorLocale;
+import im.vector.ui.themes.ThemeUtils;
 import im.vector.util.MatrixLinkMovementMethod;
 import im.vector.util.MatrixURLSpan;
 import im.vector.util.RiotEventDisplay;
-import im.vector.util.ThemeUtils;
 import im.vector.util.VectorImageGetter;
 import im.vector.util.VectorUtils;
 import im.vector.view.PillView;
@@ -146,21 +145,6 @@ class VectorMessagesAdapterHelper {
     }
 
     /**
-     * Returns an user display name for an user Id.
-     *
-     * @param userId    the user id.
-     * @param roomState the room state
-     * @return teh user display name.
-     */
-    public static String getUserDisplayName(String userId, RoomState roomState) {
-        if (null != roomState) {
-            return roomState.getMemberName(userId);
-        } else {
-            return userId;
-        }
-    }
-
-    /**
      * init the sender value
      *
      * @param convertView  the base view
@@ -186,17 +170,17 @@ class VectorMessagesAdapterHelper {
 
                 // theses events are managed like notice ones
                 // but they are dedicated behaviour i.e the sender must not be displayed
-                if (event.isCallEvent() ||
-                        Event.EVENT_TYPE_STATE_ROOM_TOPIC.equals(eventType) ||
-                        Event.EVENT_TYPE_STATE_ROOM_MEMBER.equals(eventType) ||
-                        Event.EVENT_TYPE_STATE_ROOM_NAME.equals(eventType) ||
-                        Event.EVENT_TYPE_STATE_ROOM_THIRD_PARTY_INVITE.equals(eventType) ||
-                        Event.EVENT_TYPE_STATE_HISTORY_VISIBILITY.equals(eventType) ||
-                        Event.EVENT_TYPE_MESSAGE_ENCRYPTION.equals(eventType)) {
+                if (event.isCallEvent()
+                        || Event.EVENT_TYPE_STATE_ROOM_TOPIC.equals(eventType)
+                        || Event.EVENT_TYPE_STATE_ROOM_MEMBER.equals(eventType)
+                        || Event.EVENT_TYPE_STATE_ROOM_NAME.equals(eventType)
+                        || Event.EVENT_TYPE_STATE_ROOM_THIRD_PARTY_INVITE.equals(eventType)
+                        || Event.EVENT_TYPE_STATE_HISTORY_VISIBILITY.equals(eventType)
+                        || Event.EVENT_TYPE_MESSAGE_ENCRYPTION.equals(eventType)) {
                     senderTextView.setVisibility(View.GONE);
                 } else {
                     senderTextView.setVisibility(View.VISIBLE);
-                    senderTextView.setText(getUserDisplayName(event.getSender(), row.getRoomState()));
+                    senderTextView.setText(row.getSenderDisplayName());
 
                     final String fSenderId = event.getSender();
                     final String fDisplayName = (null == senderTextView.getText()) ? "" : senderTextView.getText().toString();
@@ -322,15 +306,14 @@ class VectorMessagesAdapterHelper {
             }
 
             moreText.setVisibility((groupIdsSet.size() <= imageViews.size()) ? View.GONE : View.VISIBLE);
-            moreText.setText("+" + (groupIdsSet.size() - imageViews.size()));
+            moreText.setText(mContext.getString(R.string.plus_x, groupIdsSet.size() - imageViews.size()));
 
             if (groupIdsSet.size() > 0) {
                 groupFlairView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (null != mEventsListener) {
-                            mEventsListener.onGroupFlairClick(event.getSender()
-                                    , groupIds);
+                            mEventsListener.onGroupFlairClick(event.getSender(), groupIds);
                         }
                     }
                 });
@@ -439,14 +422,9 @@ class VectorMessagesAdapterHelper {
      * @param row        the message row
      */
     void loadMemberAvatar(ImageView avatarView, MessageRow row) {
-        RoomState roomState = row.getRoomState();
         Event event = row.getEvent();
 
-        RoomMember roomMember = null;
-
-        if (null != roomState) {
-            roomMember = roomState.getMember(event.getSender());
-        }
+        RoomMember roomMember = row.getSender();
 
         String url = null;
         String displayName = null;
@@ -536,12 +514,13 @@ class VectorMessagesAdapterHelper {
         }
 
         if (null != avatarLayoutView) {
-            ImageView avatarImageView = avatarLayoutView.findViewById(R.id.avatar_img);
-
             if (isMergedView) {
-                avatarLayoutView.setVisibility(View.GONE);
+                avatarLayoutView.setVisibility(View.INVISIBLE);
             } else {
                 avatarLayoutView.setVisibility(View.VISIBLE);
+
+                ImageView avatarImageView = avatarLayoutView.findViewById(R.id.avatar_img);
+
                 avatarImageView.setTag(null);
 
                 loadMemberAvatar(avatarImageView, row);
@@ -564,12 +543,12 @@ class VectorMessagesAdapterHelper {
         FrameLayout.LayoutParams subViewLinearLayout = (FrameLayout.LayoutParams) subView.getLayoutParams();
 
         ViewGroup.LayoutParams avatarLayout = avatarLayoutView.getLayoutParams();
-        subViewLinearLayout.gravity = Gravity.LEFT | Gravity.CENTER_VERTICAL;
+        subViewLinearLayout.gravity = Gravity.START | Gravity.CENTER_VERTICAL;
 
         if (isMergedView) {
-            bodyLayout.setMargins(avatarLayout.width, bodyLayout.topMargin, 4, bodyLayout.bottomMargin);
+            bodyLayout.setMargins(avatarLayout.width, bodyLayout.topMargin, bodyLayout.rightMargin, bodyLayout.bottomMargin);
         } else {
-            bodyLayout.setMargins(4, bodyLayout.topMargin, 4, bodyLayout.bottomMargin);
+            bodyLayout.setMargins(0, bodyLayout.topMargin, bodyLayout.rightMargin, bodyLayout.bottomMargin);
         }
         subView.setLayoutParams(bodyLayout);
 
@@ -656,7 +635,10 @@ class VectorMessagesAdapterHelper {
      * @param row           the message row
      * @param isPreviewMode true if preview mode
      */
-    void displayReadReceipts(View convertView, MessageRow row, boolean isPreviewMode) {
+    void displayReadReceipts(View convertView,
+                             MessageRow row,
+                             boolean isPreviewMode,
+                             @Nullable Map<String, RoomMember> liveRoomMembers) {
         View avatarsListView = convertView.findViewById(R.id.messagesAdapter_avatars_list);
 
         if (null == avatarsListView) {
@@ -668,15 +650,8 @@ class VectorMessagesAdapterHelper {
         }
 
         final String eventId = row.getEvent().eventId;
-        RoomState roomState = row.getRoomState();
 
         IMXStore store = mSession.getDataHandler().getStore();
-
-        // sanity check
-        if (null == roomState) {
-            avatarsListView.setVisibility(View.GONE);
-            return;
-        }
 
         // hide the read receipts until there is a way to retrieve them
         // without triggering a request per message
@@ -685,13 +660,25 @@ class VectorMessagesAdapterHelper {
             return;
         }
 
-        List<ReceiptData> receipts = store.getEventReceipts(roomState.roomId, eventId, true, true);
+        List<ReceiptData> receipts = store.getEventReceipts(row.getEvent().roomId, eventId, true, true);
 
         // if there is no receipt to display
         // hide the dedicated layout
         if ((null == receipts) || (0 == receipts.size())) {
             avatarsListView.setVisibility(View.GONE);
             return;
+        }
+
+        if (null == mRoom) {
+            // The read receipt handling required the room state. So we retrieve the current room (if any).
+            // Do not create it if it is not available. For example the room is not available during a room preview.
+            mRoom = mSession.getDataHandler().getRoom(row.getEvent().roomId, false);
+
+            if (null == mRoom) {
+                Log.d(LOG_TAG, "## displayReadReceipts () : the room is not available");
+                avatarsListView.setVisibility(View.GONE);
+                return;
+            }
         }
 
         avatarsListView.setVisibility(View.VISIBLE);
@@ -711,7 +698,14 @@ class VectorMessagesAdapterHelper {
 
         for (; index < bound; index++) {
             final ReceiptData r = receipts.get(index);
-            RoomMember member = roomState.getMember(r.userId);
+            // For read receipt, we use the last room member data, so get it from the room state
+            RoomMember member = mRoom.getState().getMember(r.userId);
+
+            if (member == null && liveRoomMembers != null) {
+                // Get the member form the live room members
+                member = liveRoomMembers.get(r.userId);
+            }
+
             ImageView imageView = (ImageView) imageViews.get(index);
 
             imageView.setVisibility(View.VISIBLE);
@@ -726,14 +720,21 @@ class VectorMessagesAdapterHelper {
         }
 
         moreText.setVisibility((receipts.size() <= imageViews.size()) ? View.GONE : View.VISIBLE);
-        moreText.setText((receipts.size() - imageViews.size()) + "+");
+        moreText.setText(mContext.getString(R.string.x_plus, receipts.size() - imageViews.size()));
 
         for (; index < imageViews.size(); index++) {
             imageViews.get(index).setVisibility(View.INVISIBLE);
         }
 
+        // Read receipt clickable zone
+        View clickable = avatarsListView.findViewById(R.id.read_receipt_avatars_list);
+        if (clickable == null) {
+            // Fallback to the parent
+            clickable = avatarsListView;
+        }
+
         if (receipts.size() > 0) {
-            avatarsListView.setOnClickListener(new View.OnClickListener() {
+            clickable.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (null != mEventsListener) {
@@ -742,7 +743,7 @@ class VectorMessagesAdapterHelper {
                 }
             });
         } else {
-            avatarsListView.setOnClickListener(null);
+            clickable.setOnClickListener(null);
         }
     }
 
@@ -793,7 +794,12 @@ class VectorMessagesAdapterHelper {
             int flags = strBuilder.getSpanFlags(span);
 
             if (PillView.isPillable(span.getURL())) {
-                final String key = span.getURL() + " " + isHighlighted;
+                // This URL link can be replaced by a Pill:
+                // Build the Drawable spannable thanks to a PillView
+                // And replace the URLSpan by a clickable ImageSpan
+
+                // the key is built with the link, the highlight status and the text of the link
+                final String key = span.getURL() + " " + isHighlighted + " " + strBuilder.subSequence(start, end).toString();
                 Drawable drawable = mPillsDrawableCache.get(key);
 
                 if (null == drawable) {
@@ -848,9 +854,9 @@ class VectorMessagesAdapterHelper {
      * @return true if it contains code blocks
      */
     boolean containsFencedCodeBlocks(final Message message) {
-        return (null != message.formatted_body) &&
-                message.formatted_body.contains(START_FENCED_BLOCK) &&
-                message.formatted_body.contains(END_FENCED_BLOCK);
+        return (null != message.formatted_body)
+                && message.formatted_body.contains(START_FENCED_BLOCK)
+                && message.formatted_body.contains(END_FENCED_BLOCK);
     }
 
     private Map<String, String[]> mCodeBlocksMap = new HashMap<>();
@@ -887,7 +893,7 @@ class VectorMessagesAdapterHelper {
             return;
         }
 
-        textView.setBackgroundColor(ThemeUtils.INSTANCE.getColor(mContext, R.attr.markdown_block_background_color));
+        textView.setBackgroundColor(ThemeUtils.INSTANCE.getColor(mContext, R.attr.vctr_markdown_block_background_color));
     }
 
     /**
@@ -913,8 +919,8 @@ class VectorMessagesAdapterHelper {
     CharSequence highlightPattern(Spannable text, String pattern, CharacterStyle highLightTextStyle, boolean isHighlighted) {
         if (!TextUtils.isEmpty(pattern) && !TextUtils.isEmpty(text) && (text.length() >= pattern.length())) {
 
-            String lowerText = text.toString().toLowerCase(VectorApp.getApplicationLocale());
-            String lowerPattern = pattern.toLowerCase(VectorApp.getApplicationLocale());
+            String lowerText = text.toString().toLowerCase(VectorLocale.INSTANCE.getApplicationLocale());
+            String lowerPattern = pattern.toLowerCase(VectorLocale.INSTANCE.getApplicationLocale());
 
             int start = 0;
             int pos = lowerText.indexOf(lowerPattern, start);
@@ -945,15 +951,14 @@ class VectorMessagesAdapterHelper {
     CharSequence convertToHtml(String htmlFormattedText) {
         final HtmlTagHandler htmlTagHandler = new HtmlTagHandler();
         htmlTagHandler.mContext = mContext;
-        htmlTagHandler.setCodeBlockBackgroundColor(ThemeUtils.INSTANCE.getColor(mContext, R.attr.markdown_block_background_color));
+        htmlTagHandler.setCodeBlockBackgroundColor(ThemeUtils.INSTANCE.getColor(mContext, R.attr.vctr_markdown_block_background_color));
 
         CharSequence sequence;
 
         // an html format has been released
         if (null != htmlFormattedText) {
-            boolean isCustomizable = !htmlFormattedText.contains("<a href=") && !htmlFormattedText.contains("<table>");
+            boolean isCustomizable = !htmlFormattedText.contains("<table>");
 
-            // the links are not yet supported by ConsoleHtmlTagHandler
             // the markdown tables are not properly supported
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 sequence = Html.fromHtml(htmlFormattedText,
@@ -1004,10 +1009,9 @@ class VectorMessagesAdapterHelper {
             return false;
         }
 
-        RoomState roomState = row.getRoomState();
         Event event = row.getEvent();
 
-        if ((null == roomState) || (null == event)) {
+        if ((null == event)) {
             return false;
         }
 
@@ -1025,27 +1029,29 @@ class VectorMessagesAdapterHelper {
             return !TextUtils.isEmpty(stickerMessage.body) && !event.isRedacted();
         } else if (Event.EVENT_TYPE_STATE_ROOM_TOPIC.equals(eventType)
                 || Event.EVENT_TYPE_STATE_ROOM_NAME.equals(eventType)) {
-            EventDisplay display = new RiotEventDisplay(context, event, roomState);
-            return display.getTextualDisplay() != null;
+            EventDisplay display = new RiotEventDisplay(context);
+            return row.getText(null, display) != null;
         } else if (event.isCallEvent()) {
-            return Event.EVENT_TYPE_CALL_INVITE.equals(eventType) ||
-                    Event.EVENT_TYPE_CALL_ANSWER.equals(eventType) ||
-                    Event.EVENT_TYPE_CALL_HANGUP.equals(eventType);
-        } else if (Event.EVENT_TYPE_STATE_ROOM_MEMBER.equals(eventType) || Event.EVENT_TYPE_STATE_ROOM_THIRD_PARTY_INVITE.equals(eventType)) {
+            return Event.EVENT_TYPE_CALL_INVITE.equals(eventType)
+                    || Event.EVENT_TYPE_CALL_ANSWER.equals(eventType)
+                    || Event.EVENT_TYPE_CALL_HANGUP.equals(eventType);
+        } else if (Event.EVENT_TYPE_STATE_ROOM_MEMBER.equals(eventType)
+                || Event.EVENT_TYPE_STATE_ROOM_THIRD_PARTY_INVITE.equals(eventType)) {
             // if we can display text for it, it's valid.
-            EventDisplay display = new RiotEventDisplay(context, event, roomState);
-            return display.getTextualDisplay() != null;
+            EventDisplay display = new RiotEventDisplay(context);
+            return row.getText(null, display) != null;
         } else if (Event.EVENT_TYPE_STATE_HISTORY_VISIBILITY.equals(eventType)) {
             return true;
-        } else if (Event.EVENT_TYPE_MESSAGE_ENCRYPTED.equals(eventType) || Event.EVENT_TYPE_MESSAGE_ENCRYPTION.equals(eventType)) {
+        } else if (Event.EVENT_TYPE_MESSAGE_ENCRYPTED.equals(eventType)
+                || Event.EVENT_TYPE_MESSAGE_ENCRYPTION.equals(eventType)) {
             // if we can display text for it, it's valid.
-            EventDisplay display = new RiotEventDisplay(context, event, roomState);
-            return event.hasContentFields() && (display.getTextualDisplay() != null);
+            EventDisplay display = new RiotEventDisplay(context);
+            return event.hasContentFields() && row.getText(null, display) != null;
         } else if (TextUtils.equals(WidgetsManager.WIDGET_EVENT_TYPE, event.getType())) {
             // Matrix apps are enabled
             return true;
         } else if (Event.EVENT_TYPE_STATE_ROOM_CREATE.equals(eventType)) {
-            return roomState.hasPredecessor();
+            return row.getRoomCreateContentPredecessor() != null;
         }
         return false;
     }

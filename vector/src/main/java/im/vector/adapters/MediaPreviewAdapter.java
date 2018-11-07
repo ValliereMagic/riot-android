@@ -49,7 +49,7 @@ public class MediaPreviewAdapter extends RecyclerView.Adapter<MediaPreviewAdapte
     @NonNull
     @Override
     public MediaItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.media_preview, parent, false);
+        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_item_media_preview, parent, false);
         return new MediaItemViewHolder(view);
     }
 
@@ -61,11 +61,10 @@ public class MediaPreviewAdapter extends RecyclerView.Adapter<MediaPreviewAdapte
         final Uri uri = roomMediaMessage.getUri();
         if (mimeType != null) {
             if (mimeType.startsWith("image") || mimeType.startsWith("video")) {
-                final RequestOptions options = new RequestOptions().frame(0);
                 Glide.with(context)
                         .asBitmap()
                         .load(uri)
-                        .apply(options)
+                        .apply(new RequestOptions().frame(0))
                         .into(holder.mImagePreview);
             } else {
                 holder.mImagePreview.setImageResource(R.drawable.filetype_attachment);

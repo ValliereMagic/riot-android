@@ -1,4 +1,4 @@
-Riot-Android  [![Jenkins](https://img.shields.io/jenkins/s/https/matrix.org/jenkins/view/MatrixView/job/VectorAndroidDevelop.svg)](https://matrix.org/jenkins/view/MatrixView/job/VectorAndroidDevelop/) [![Weblate](https://translate.riot.im/widgets/riot-android/-/svg-badge.svg)](https://translate.riot.im/engage/riot-android/?utm_source=widget)
+Riot-Android [![Jenkins](https://img.shields.io/jenkins/s/https/matrix.org/jenkins/view/MatrixView/job/VectorAndroidDevelop.svg)](https://matrix.org/jenkins/view/MatrixView/job/VectorAndroidDevelop/) [![Weblate](https://translate.riot.im/widgets/riot-android/-/svg-badge.svg)](https://translate.riot.im/engage/riot-android/?utm_source=widget) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=vector.android.riot&metric=alert_status)](https://sonarcloud.io/dashboard?id=vector.android.riot) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=vector.android.riot&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=vector.android.riot) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=vector.android.riot&metric=bugs)](https://sonarcloud.io/dashboard?id=vector.android.riot) 
 =======
 
  Riot is an Android Matrix client.
@@ -56,9 +56,9 @@ Let says your application is named MyRiot : You have to create your own flavour.
 Modify riot-android/vector/build.gradle
 ---------------------------------------
 
-In "productFlavors" section, duplicate "app" group if you plan to use GCM/FCM or "appfdroid" if don't.
+In "productFlavors" section, duplicate "app" group if you plan to use FCM or "appfdroid" if don't.
 
-for example, with GCM, it would give
+for example, with FCM, it would give
 
 ```
     appmyriot {
@@ -66,22 +66,21 @@ for example, with GCM, it would give
         // use the version name
         versionCode rootProject.ext.versionCodeProp
         versionName rootProject.ext.versionNameProp
-        resValue "string", "allow_gcm_use", "true"
-        resValue "string", "allow_ga_use", "true"
-        resValue "string", "short_flavor_description", "G"
-        resValue "string", "flavor_description", "GooglePlay"
+        buildConfigField "boolean", "ALLOW_FCM_USE", "true"
+        buildConfigField "String", "SHORT_FLAVOR_DESCRIPTION", "\"F\""
+        buildConfigField "String", "FLAVOR_DESCRIPTION", "\"FDroid\""
     }
 ```
 
-- if you use GCM, duplicate appCompile at the end of this file and replace appCompile by appmyriotCompile.
+- if you use FCM, duplicate appCompile at the end of this file and replace appCompile by appmyriotCompile.
 - if you don't, update the "if (!getGradle().getStartParameter().getTaskRequests().toString().contains("fdroid"))" to include your flavor.
 
 Create your flavour directory
 -----------------------------
 
-- Copy riot-android/vector/src/app or appfroid if you use GCM or you don’t.
+- Copy riot-android/vector/src/app or appfroid if you use FCM or you don’t.
 - Rename it to appmyriot.
-- If you use GCM, you will need to generate your own google-services.json.
+- If you use FCM, you will need to generate your own google-services.json.
 
 Customise your flavour
 ----------------------

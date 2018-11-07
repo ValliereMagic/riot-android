@@ -7,7 +7,7 @@
     <string name="black_them">Čierny vzhľad</string>
 
     <string name="notification_sync_in_progress">Synchronizácia</string>
-    <string name="notification_listen_for_events">Spracovanie udalostí</string>
+    <string name="notification_listening_for_events">Spracovanie udalostí</string>
 
     <string name="title_activity_home">Správy</string>
     <string name="title_activity_room">Miestnosť</string>
@@ -355,7 +355,6 @@ Ste si istí?</string>
     <string name="room_delete_unsent_messages">Vymazať neodoslané správy</string>
     <string name="room_message_file_not_found">Súbor nenájdený</string>
     <string name="room_do_not_have_permission_to_post">Nemáte udelené právo posielať do tejto miestnosti</string>
-    <string name="room_new_message_notification">1 nová správa</string>
 
     <string name="ssl_trust">Dôverovať</string>
     <string name="ssl_do_not_trust">Nedôverovať</string>
@@ -368,7 +367,6 @@ Ste si istí?</string>
     <string name="ssl_unexpected_existing_expl">Certifikát sa zmenil na taký, ktorý nie je viac dôverovaný vašim zariadením. Takáto zmena je veľmi nezvičajná. Navrhujeme, aby ste NEDÔVEROVALI tomuto novému certifikátu.</string>
     <string name="ssl_expected_existing_expl">Vami overený certifikát sa zmenil na taký, ktorý nie je viac dôverovaný vašim zariadením. Je pravdepodobné, že správca servera obnovil certifikát. Na účel ručného overenia si prosím vyžiadajte nový odtlačok.</string>
     <string name="ssl_only_accept">Dôverujte certifikátu len v prípade, že správca servera zverejnil odtlačok zhodný s odtlačkom zobrazeným vyššie.</string>
-    <string name="ssl_fingerprint_example">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</string>
 
     <string name="room_details_title">Podrobnosti o miestnosti</string>
     <string name="room_details_people">Ľudia</string>
@@ -384,11 +382,6 @@ Ste si istí?</string>
 Pozor! Vykonaním tejto akcie reštartujete aplikáciu a opätovné načítanie môže chvíľu trvať.</string>
     <string name="room_event_action_cancel_upload">Zrušiť nahrávanie</string>
     <string name="room_event_action_cancel_download">Zrušiť sťahovanie</string>
-
-    <string name="room_displayname_invite_from">Pozvanie od %s</string>
-    <string name="room_displayname_room_invite">Pozvanie do miestnosti</string>
-    <string name="room_displayname_two_members">%1$s a %2$s</string>
-    <string name="room_displayname_no_title">Prázdna miestnosť</string>
 
     <string name="search_hint">Hľadať</string>
     <string name="search_members_hint">Filtrovať členov v miestnosti</string>
@@ -497,7 +490,6 @@ Pozor! Vykonaním tejto akcie reštartujete aplikáciu a opätovné načítanie 
     <string name="devices_details_device_name">Názov zariadenia</string>
     <string name="devices_details_last_seen_title">Naposledy videné</string>
     <string name="devices_details_last_seen_format">%1$s @ %2$s</string>
-    <string name="devices_details_time_format">HH:mm:ss</string>
     <string name="devices_delete_dialog_text">Táto operácia si vyžaduje dodatočné overenie.
 Ak chcete pokračovať, prosím zadajte vaše heslo.</string>
     <string name="devices_delete_dialog_title">Overenie</string>
@@ -560,9 +552,6 @@ Pozor! Vykonaním tejto akcie reštartujete aplikáciu a opätovné načítanie 
     <string name="room_settings_tag_pref_entry_low_priority">Nízka priorita</string>
     <string name="room_settings_tag_pref_entry_none">Žiadne</string>
     <string name="room_settings_tag_pref_no_tag">Neoznačená</string>
-    <string name="room_settings_tag_pref_entry_value_favourite">favourite</string>
-    <string name="room_settings_tag_pref_entry_value_low_priority">low</string>
-    <string name="room_settings_tag_pref_entry_value_none">none</string>
 
     <string name="room_settings_category_access_visibility_title">Prístup a viditeľnosť</string>
     <string name="room_settings_directory_visibility">Uverejniť túto miestnosť v adresári miestností</string>
@@ -599,7 +588,7 @@ Pozor! Vykonaním tejto akcie reštartujete aplikáciu a opätovné načítanie 
 
     <string name="room_settings_addresses_invalid_format_dialog_title">Nesprávny formát aliasu</string>
     <string name="room_settings_addresses_invalid_format_dialog_body">\'%s\' nie je platný formát aliasu</string>
-    <string name="room_settings_addresses_disable_main_address_prompt_msg">Nebude určená hlavná adresa pre túto miestnosť. Namiesto hlavnej adresy sa vždy použije náhodná adresa</string>
+    <string name="room_settings_addresses_disable_main_address_prompt_msg">Nebude určená hlavná adresa tejto miestnosti.</string>
     <string name="room_settings_addresses_disable_main_address_prompt_title">Upozornenie - Hlavná adresa</string>
 
     <string name="room_settings_set_main_address">Nastaviť ako hlavnú adresu</string>
@@ -650,7 +639,7 @@ Ak v miestnosti povolíte šifrovanie, šifrovanie nie je viac možné zakázať
     <string name="encryption_export_room_keys">Exportovať kľúče miestností</string>
     <string name="encryption_export_room_keys_summary">Exportovať kľúče miestností do lokálneho súboru</string>
     <string name="encryption_export_export">Exportovať</string>
-    <string name="encryption_export_enter_passphrase">Zadajte heslo</string>
+    <string name="encryption_import_enter_passphrase">Zadajte heslo</string>
     <string name="encryption_export_confirm_passphrase">Potvrďte heslo</string>
     <string name="encryption_export_saved_as">Šifrovacie kľúče miestností boli uložené do %s
 
@@ -726,7 +715,6 @@ Neznáme zariadenia:</string>
     <string name="widget_integration_missing_room_id">V požiadavke chýba room_id.</string>
     <string name="widget_integration_missing_user_id">V požiadavke chýba user_id.</string>
     <string name="widget_integration_room_not_visible">Miestnosť %s nie je viditeľná.</string>
-    <string name="settings_labs_matrix_apps">Matrix Aplikácie</string>
     <string name="room_add_matrix_apps">Pridať Matrix aplikácie</string>
 
     <!-- share keys -->
@@ -745,9 +733,6 @@ Neznáme zariadenia:</string>
     <string name="option_take_video">Poslať video</string>
 
     <string name="settings_analytics">Štatistika</string>
-    <string name="settings_opt_out_of_analytics">Odhlásiť sa zo zasielania štatistiky</string>
-    <string name="settings_opt_out_of_analytics_summary">Riot zbiera anonymné štatistiky, ktoré nám umožňujú aplikáciu ďalej vylepšovať.</string>
-
 
     <string name="settings_labs_native_camera">Používať vstavaný fotoaparát a kameru</string>
 
@@ -768,7 +753,7 @@ Neznáme zariadenia:</string>
 
 <string name="title_activity_group_details">Podrobnosti o komunite</string>
 
-    <string name="loading">Načítavanie...</string>
+    <string name="loading">Načítavanie…</string>
 
     <string name="action_exit">Ukončiť</string>
     <string name="bottom_action_groups">Komunity</string>
@@ -844,7 +829,7 @@ Neznáme zariadenia:</string>
 
     <string name="list_members">Zobraziť členov</string>
     <string name="open_chat_header">Otvoriť záhlavie</string>
-    <string name="room_sync_in_progress">Synchronizácia...</string>
+    <string name="room_sync_in_progress">Synchronizácia…</string>
     <plurals name="room_header_active_members_count">
 	<item quantity="one">1 aktívny člen</item>
 	<item quantity="few">%d aktívni členovia</item>
@@ -861,14 +846,6 @@ Neznáme zariadenia:</string>
 	<item quantity="one">1 nová správa</item>
 	<item quantity="few">%d nové správy</item>
 	<item quantity="many">%d nových správ</item>
-	<item quantity="other"/>
-</plurals>
-
-    <string name="room_displayname_many_members">%1$s a %2$s</string>
-    <plurals name="others">
-	<item quantity="one">1 ďalší</item>
-	<item quantity="few">%d ďalší</item>
-	<item quantity="many">%d ďalších</item>
 	<item quantity="other"/>
 </plurals>
 
@@ -924,7 +901,7 @@ Neznáme zariadenia:</string>
     <string name="settings_notification_privacy_normal">Normálne</string>
     <string name="settings_notification_privacy_need_permission">Aplikácia vyžaduje povolenie bežať na pozadí</string>
     <string name="settings_notification_privacy_no_permission">Aplikácia <b>ne</b>vyžaduje povolenie bežať na pozadí</string>
-    <string name="settings_notification_privacy_gcm">• Oznámenia sú zasielané prostredníctvom cloudových služieb Google</string>
+    <string name="settings_notification_privacy_fcm">• Oznámenia sú zasielané prostredníctvom cloudových služieb Google</string>
     <string name="settings_notification_privacy_metadata">• Oznámenia neobsahujú text správy, len meta údaje</string>
     <string name="settings_notification_privacy_secure_message_content">• Obsah správy oznámení je <b>bezpečne prevzatý priamo z domovského servera Matrix</b></string>
     <string name="settings_notification_privacy_nosecure_message_content">• Oznámenia obsahujú <b>meta údaje aj obsah správy</b></string>
@@ -1085,5 +1062,13 @@ Pozor! Vykonaním tejto akcie reštartujete aplikáciu a opätovné načítanie 
 
     <string name="resource_limit_soft_contact">Prosím %s a pokúste sa tento limit navýšiť.</string>
     <string name="resource_limit_hard_contact">Prosím %s aby ste službu mohli naďalej používať.</string>
+
+<string name="dialog_title_error">Chyba</string>
+
+    <string name="settings_lazy_loading_title">Oneskorene načítať členov miestnosti</string>
+    <string name="settings_lazy_loading_description">Zvýšiť výkon môžete načítaním členov v miestnosti až pri prvom zobrazení</string>
+    <string name="error_lazy_loading_not_supported_by_home_server">Váš domovský server zatiaľ nepodporuje oneskorené načítanie členov v miestnosti. Skúste prosím neskôr.</string>
+
+    <string name="unknown_error">Prepáčte, vyskytla sa chyba</string>
 
 </resources>

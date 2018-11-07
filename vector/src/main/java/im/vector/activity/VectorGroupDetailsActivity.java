@@ -28,6 +28,8 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 
+import org.jetbrains.annotations.NotNull;
+import org.matrix.androidsdk.MXPatterns;
 import org.matrix.androidsdk.MXSession;
 import org.matrix.androidsdk.groups.GroupsManager;
 import org.matrix.androidsdk.listeners.MXEventListener;
@@ -41,7 +43,8 @@ import java.util.List;
 import im.vector.Matrix;
 import im.vector.R;
 import im.vector.adapters.GroupDetailsFragmentPagerAdapter;
-import im.vector.util.ThemeUtils;
+import im.vector.ui.themes.ActivityOtherThemes;
+import im.vector.ui.themes.ThemeUtils;
 import im.vector.view.RiotViewPager;
 
 /**
@@ -136,6 +139,12 @@ public class VectorGroupDetailsActivity extends MXCActionBarActivity {
         return R.layout.activity_vector_group_details;
     }
 
+    @NotNull
+    @Override
+    public ActivityOtherThemes getOtherThemes() {
+        return ActivityOtherThemes.Group.INSTANCE;
+    }
+
     @Override
     public void initUiAndData() {
         if (CommonActivityUtils.shouldRestartApp(this)) {
@@ -169,7 +178,7 @@ public class VectorGroupDetailsActivity extends MXCActionBarActivity {
 
         String groupId = intent.getStringExtra(EXTRA_GROUP_ID);
 
-        if (!MXSession.isGroupId(groupId)) {
+        if (!MXPatterns.isGroupId(groupId)) {
             Log.e(LOG_TAG, "invalid group id " + groupId);
             finish();
             return;

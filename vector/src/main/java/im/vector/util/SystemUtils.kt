@@ -18,12 +18,21 @@ package im.vector.util
 
 import android.annotation.TargetApi
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
+import androidx.core.widget.toast
+import im.vector.R
+import im.vector.settings.VectorLocale
+import org.matrix.androidsdk.util.Log
+import java.util.*
+
+private const val LOG_TAG = "SystemUtils"
 
 /**
  * Tells if the application ignores battery optimizations.
@@ -45,7 +54,7 @@ fun isIgnoringBatteryOptimizations(context: Context): Boolean {
  * display the system dialog for granting this permission. If previously granted, the
  * system will not show it (so you should call this method).
  *
- * Note: If the user finally does not grant the permission, gcmRegistrationManager.isBackgroundSyncAllowed()
+ * Note: If the user finally does not grant the permission, PushManager.isBackgroundSyncAllowed()
  * will return false and the notification privacy will fallback to "LOW_DETAIL".
  */
 @TargetApi(Build.VERSION_CODES.M)
@@ -54,4 +63,41 @@ fun requestDisablingBatteryOptimization(activity: Activity, requestCode: Int) {
     intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
     intent.data = Uri.parse("package:" + activity.packageName)
     activity.startActivityForResult(intent, requestCode)
+}
+
+//==============================================================================================================
+// Clipboard helper
+//==============================================================================================================
+
+/**
+ * Copy a text to the clipboard, and display a Toast when done
+ *
+ * @param context the context
+ * @param text    the text to copy
+ */
+fun copyToClipboard(context: Context, text: CharSequence) {
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    clipboard.primaryClip = ClipData.newPlainText("", text)
+    context.toast(R.string.copied_to_clipboard)
+}
+
+/**
+ * Provides the device locale
+ *
+ * @return the device locale
+ */
+fun getDeviceLocale(context: Context): Locale {
+    var locale: Locale
+
+    locale = try {
+        val packageManager = context.packageManager
+        val resources = packageManager.getResourcesForApplication("android")
+        resources.configuration.locale
+    } catch (e: Exception) {
+        Log.e(LOG_TAG, "## getDeviceLocale() failed " + e.message, e)
+        // Fallback to application locale
+        VectorLocale.applicationLocale
+    }
+
+    return locale
 }

@@ -42,6 +42,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.matrix.androidsdk.MXPatterns;
 import org.matrix.androidsdk.MXSession;
 import org.matrix.androidsdk.data.Room;
 import org.matrix.androidsdk.groups.GroupsManager;
@@ -62,8 +63,8 @@ import im.vector.R;
 import im.vector.activity.VectorGroupDetailsActivity;
 import im.vector.adapters.AbsAdapter;
 import im.vector.adapters.GroupAdapter;
-import im.vector.util.ThemeUtils;
-import im.vector.util.VectorUtils;
+import im.vector.ui.themes.ThemeUtils;
+import im.vector.util.SystemUtilsKt;
 import im.vector.view.EmptyViewItemDecoration;
 import im.vector.view.SimpleDividerItemDecoration;
 
@@ -206,7 +207,7 @@ public class GroupsFragment extends AbsHomeFragment {
 
             @Override
             public boolean onLongPressItem(Group item, int position) {
-                VectorUtils.copyToClipboard(getActivity(), item.getGroupId());
+                SystemUtilsKt.copyToClipboard(getActivity(), item.getGroupId());
                 return true;
             }
         }, new AbsAdapter.GroupInvitationListener() {
@@ -335,7 +336,7 @@ public class GroupsFragment extends AbsHomeFragment {
             popup = new PopupMenu(context, actionView);
         }
         popup.getMenuInflater().inflate(R.menu.vector_home_group_settings, popup.getMenu());
-        ThemeUtils.INSTANCE.tintMenuIcons(popup.getMenu(), ThemeUtils.INSTANCE.getColor(context, R.attr.settings_icon_tint_color));
+        ThemeUtils.INSTANCE.tintMenuIcons(popup.getMenu(), ThemeUtils.INSTANCE.getColor(context, R.attr.vctr_settings_icon_tint_color));
 
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -380,7 +381,7 @@ public class GroupsFragment extends AbsHomeFragment {
         final EditText idEditText = dialogView.findViewById(R.id.community_id_edit_text);
         final String hostName = mSession.getHomeServerConfig().getHomeserverUri().getHost();
         TextView hsNameView = dialogView.findViewById(R.id.community_hs_name_text_view);
-        hsNameView.setText(":" + hostName);
+        hsNameView.setText(hostName);
 
         AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
                 .setView(dialogView)
@@ -441,7 +442,7 @@ public class GroupsFragment extends AbsHomeFragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                createButton.setEnabled(MXSession.isGroupId("+" + idEditText.getText().toString().trim() + ":" + hostName));
+                createButton.setEnabled(MXPatterns.isGroupId("+" + idEditText.getText().toString().trim() + ":" + hostName));
             }
 
             @Override

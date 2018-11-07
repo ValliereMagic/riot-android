@@ -24,7 +24,6 @@ import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.DownloadManager;
 import android.app.PendingIntent;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -39,6 +38,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Pair;
@@ -58,7 +58,6 @@ import org.matrix.androidsdk.db.MXMediasCache;
 import org.matrix.androidsdk.rest.callback.ApiCallback;
 import org.matrix.androidsdk.rest.callback.SimpleApiCallback;
 import org.matrix.androidsdk.rest.model.MatrixError;
-import org.matrix.androidsdk.rest.model.RoomMember;
 import org.matrix.androidsdk.util.Log;
 
 import java.io.ByteArrayInputStream;
@@ -82,12 +81,11 @@ import im.vector.VectorApp;
 import im.vector.adapters.VectorRoomsSelectionAdapter;
 import im.vector.contacts.ContactsManager;
 import im.vector.contacts.PIDsRetriever;
+import im.vector.extensions.MatrixSdkExtensionsKt;
 import im.vector.fragments.VectorUnknownDevicesFragment;
-import im.vector.gcm.GcmRegistrationManager;
+import im.vector.push.PushManager;
 import im.vector.services.EventStreamService;
-import im.vector.util.MatrixSdkExtensionsKt;
 import im.vector.util.PreferencesManager;
-import im.vector.util.VectorUtils;
 import me.leolin.shortcutbadger.ShortcutBadger;
 
 /**
@@ -164,8 +162,8 @@ public class CommonActivityUtils {
             // clear notification
             EventStreamService.removeNotification();
 
-            // unregister from the GCM.
-            Matrix.getInstance(context).getSharedGCMRegistrationManager().unregister(session, null);
+            // unregister from the push server.
+            Matrix.getInstance(context).getPushManager().unregister(session, null);
 
             // clear credentials
             Matrix.getInstance(context).clearSession(context, session, clearCredentials, new SimpleApiCallback<Void>() {
@@ -330,12 +328,12 @@ public class CommonActivityUtils {
         // clear the preferences
         PreferencesManager.clearPreferences(context);
 
-        // reset the GCM
-        Matrix.getInstance(context).getSharedGCMRegistrationManager().resetGCMRegistration();
+        // reset the FCM
+        Matrix.getInstance(context).getPushManager().resetFCMRegistration();
         // clear the preferences when the application goes to the login screen.
         if (goToLoginPage) {
             // display a dummy activity until the logout is done
-            Matrix.getInstance(context).getSharedGCMRegistrationManager().clearPreferences();
+            Matrix.getInstance(context).getPushManager().clearPreferences();
 
             if (null != activity) {
                 // go to login page
@@ -414,11 +412,11 @@ public class CommonActivityUtils {
                 // clear the preferences
                 PreferencesManager.clearPreferences(context);
 
-                // reset the GCM
-                Matrix.getInstance(context).getSharedGCMRegistrationManager().resetGCMRegistration();
+                // reset the FCM
+                Matrix.getInstance(context).getPushManager().resetFCMRegistration();
 
                 // clear the preferences
-                Matrix.getInstance(context).getSharedGCMRegistrationManager().clearPreferences();
+                Matrix.getInstance(context).getPushManager().clearPreferences();
 
                 // Clear the credentials
                 Matrix.getInstance(context).getLoginStorage().clear();
@@ -542,13 +540,13 @@ public class CommonActivityUtils {
     }
 
     /**
-     * Warn the events stream that there was a GCM status update.
+     * Warn the events stream that there was a push status update.
      *
      * @param context the context.
      */
-    public static void onGcmUpdate(Context context) {
-        Log.d(LOG_TAG, "onGcmUpdate");
-        sendEventStreamAction(context, EventStreamService.StreamAction.GCM_STATUS_UPDATE);
+    public static void onPushUpdate(Context context) {
+        Log.d(LOG_TAG, "onPushUpdate");
+        sendEventStreamAction(context, EventStreamService.StreamAction.PUSH_STATUS_UPDATE);
     }
 
     /**
@@ -565,7 +563,7 @@ public class CommonActivityUtils {
             Collection<MXSession> sessions = Matrix.getInstance(context.getApplicationContext()).getSessions();
 
             if ((null != sessions) && (sessions.size() > 0)) {
-                GcmRegistrationManager gcmRegistrationManager = Matrix.getInstance(context).getSharedGCMRegistrationManager();
+                PushManager pushManager = Matrix.getInstance(context).getPushManager();
                 Log.e(LOG_TAG, "## startEventStreamService() : restart EventStreamService");
 
                 for (MXSession session : sessions) {
@@ -582,8 +580,8 @@ public class CommonActivityUtils {
                             session.checkCrypto();
                         }
 
-                        session.setSyncDelay(gcmRegistrationManager.isBackgroundSyncAllowed() ? gcmRegistrationManager.getBackgroundSyncDelay() : 0);
-                        session.setSyncTimeout(gcmRegistrationManager.getBackgroundSyncTimeOut());
+                        session.setSyncDelay(pushManager.isBackgroundSyncAllowed() ? pushManager.getBackgroundSyncDelay() : 0);
+                        session.setSyncTimeout(pushManager.getBackgroundSyncTimeOut());
 
                         // session to activate
                         matrixIds.add(session.getCredentials().userId);
@@ -595,7 +593,7 @@ public class CommonActivityUtils {
                     Intent intent = new Intent(context, EventStreamService.class);
                     intent.putExtra(EventStreamService.EXTRA_MATRIX_IDS, matrixIds.toArray(new String[matrixIds.size()]));
                     intent.putExtra(EventStreamService.EXTRA_STREAM_ACTION, EventStreamService.StreamAction.START.ordinal());
-                    context.startService(intent);
+                    ContextCompat.startForegroundService(context, intent);
                 }
             }
 
@@ -659,7 +657,7 @@ public class CommonActivityUtils {
 
                 // get the room alias (if any) for the preview data
                 if ((null != room) && (null != room.getState())) {
-                    roomAlias = room.getState().getAlias();
+                    roomAlias = room.getState().getCanonicalAlias();
                 }
 
                 intentRetCode = new Intent(aContext, aTargetActivity);
@@ -711,19 +709,19 @@ public class CommonActivityUtils {
         // Check whether the room exists to handled the cases where the user is invited or he has joined.
         // CAUTION: the room may exist whereas the user membership is neither invited nor joined.
         final Room room = session.getDataHandler().getRoom(roomId, false);
-        if (null != room && room.hasMembership(RoomMember.MEMBERSHIP_INVITE)) {
+        if (null != room && room.isInvited()) {
             Log.d(LOG_TAG, "previewRoom : the user is invited -> display the preview " + VectorApp.getCurrentActivity());
             previewRoom(fromActivity, roomPreviewData);
 
             if (null != callback) {
                 callback.onSuccess(null);
             }
-        } else if (null != room && room.hasMembership(RoomMember.MEMBERSHIP_JOIN)) {
+        } else if (null != room && room.isJoined()) {
             Log.d(LOG_TAG, "previewRoom : the user joined the room -> open the room");
             final Map<String, Object> params = new HashMap<>();
             params.put(VectorRoomActivity.EXTRA_MATRIX_ID, session.getMyUserId());
             params.put(VectorRoomActivity.EXTRA_ROOM_ID, roomId);
-            CommonActivityUtils.goToRoomPage(fromActivity, session, params);
+            goToRoomPage(fromActivity, session, params);
 
             if (null != callback) {
                 callback.onSuccess(null);
@@ -767,18 +765,7 @@ public class CommonActivityUtils {
     // Room jump methods.
     //==============================================================================================================
 
-    /**
-     * Start a room activity with the dedicated parameters.
-     * Pop the activity to the homeActivity before pushing the new activity.
-     *
-     * @param fromActivity the caller activity.
-     * @param params       the room activity parameters
-     */
-    public static void goToRoomPage(final Activity fromActivity, final Map<String, Object> params) {
-        goToRoomPage(fromActivity, null, params);
-    }
-
-    /**
+   /**
      * Start a room activity with the dedicated parameters.
      * Pop the activity to the homeActivity before pushing the new activity.
      *
@@ -786,11 +773,13 @@ public class CommonActivityUtils {
      * @param session      the session.
      * @param params       the room activity parameters.
      */
-    public static void goToRoomPage(final Activity fromActivity, final MXSession session, final Map<String, Object> params) {
+    public static void goToRoomPage(@NonNull final Activity fromActivity,
+                                    final MXSession session,
+                                    @NonNull final Map<String, Object> params) {
         final MXSession finalSession = (session == null) ? Matrix.getMXSession(fromActivity, (String) params.get(VectorRoomActivity.EXTRA_MATRIX_ID)) : session;
 
         // sanity check
-        if ((null == finalSession) || !finalSession.isAlive()) {
+        if (finalSession == null || !finalSession.isAlive()) {
             return;
         }
 
@@ -841,7 +830,7 @@ public class CommonActivityUtils {
                                 Room room = finalSession.getDataHandler().getRoom((String) params.get(VectorRoomActivity.EXTRA_ROOM_ID));
 
                                 if ((null != room) && room.isInvited()) {
-                                    String displayName = VectorUtils.getRoomDisplayName(fromActivity, finalSession, room);
+                                    String displayName = room.getRoomDisplayName(fromActivity);
 
                                     if (null != displayName) {
                                         intent.putExtra(VectorRoomActivity.EXTRA_DEFAULT_NAME, displayName);
@@ -869,6 +858,8 @@ public class CommonActivityUtils {
      * @param aSearchedUserId the searched user ID
      * @return an array containing the found rooms
      */
+    // Commented out as unused
+    /*
     private static List<Room> findOneToOneRoomList(final MXSession aSession, final String aSearchedUserId) {
         List<Room> listRetValue = new ArrayList<>();
         List<RoomMember> roomMembersList;
@@ -894,6 +885,7 @@ public class CommonActivityUtils {
 
         return listRetValue;
     }
+   */
 
     /**
      * Set a room as a direct chat room.<br>
@@ -1007,7 +999,7 @@ public class CommonActivityUtils {
                                         params.put(VectorRoomActivity.EXTRA_ROOM_ID, summary.getRoomId());
                                         params.put(VectorRoomActivity.EXTRA_ROOM_INTENT, intent);
 
-                                        CommonActivityUtils.goToRoomPage(fromActivity, session, params);
+                                        goToRoomPage(fromActivity, session, params);
                                     }
                                 });
                             }
@@ -1244,8 +1236,8 @@ public class CommonActivityUtils {
     /**
      * Refresh the badge count for specific configurations.<br>
      * The refresh is only effective if the device is:
-     * <ul><li>offline</li><li>does not support GCM</li>
-     * <li>GCM registration failed</li>
+     * <ul><li>offline</li><li>does not support FCM</li>
+     * <li>FCM registration failed</li>
      * <br>Notifications rooms are parsed to track the notification count value.
      *
      * @param aSession session value
@@ -1262,11 +1254,11 @@ public class CommonActivityUtils {
         } else {
             if (aSession.isAlive()) {
                 boolean isRefreshRequired;
-                GcmRegistrationManager gcmMgr = Matrix.getInstance(aContext).getSharedGCMRegistrationManager();
+                PushManager pushManager = Matrix.getInstance(aContext).getPushManager();
 
-                // update the badge count if the device is offline, GCM is not supported or GCM registration failed
+                // update the badge count if the device is offline, FCM is not supported or FCM registration failed
                 isRefreshRequired = !Matrix.getInstance(aContext).isConnected();
-                isRefreshRequired |= (null != gcmMgr) && (!gcmMgr.useGCM() || !gcmMgr.hasRegistrationToken());
+                isRefreshRequired |= (null != pushManager) && (!pushManager.useFcm() || !pushManager.hasRegistrationToken());
 
                 if (isRefreshRequired) {
                     updateBadgeCount(aContext, dataHandler);
@@ -1421,7 +1413,7 @@ public class CommonActivityUtils {
         AlertDialog.Builder builder = new AlertDialog.Builder(activiy);
         LayoutInflater inflater = activiy.getLayoutInflater();
 
-        View layout = inflater.inflate(R.layout.encrypted_verify_device, null);
+        View layout = inflater.inflate(R.layout.dialog_device_verify, null);
 
         TextView textView;
 
@@ -1435,9 +1427,9 @@ public class CommonActivityUtils {
         textView.setText(MatrixSdkExtensionsKt.getFingerprintHumanReadable(deviceInfo));
 
         builder
-                .setView(layout)
                 .setTitle(R.string.encryption_information_verify_device)
-                .setPositiveButton(R.string.encryption_information_verify_key_match, new DialogInterface.OnClickListener() {
+                .setView(layout)
+                .setPositiveButton(R.string.encryption_information_verify, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         session.getCrypto().setDeviceVerification(MXDeviceInfo.DEVICE_VERIFICATION_VERIFIED, deviceInfo.deviceId, sender, callback);

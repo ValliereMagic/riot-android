@@ -13,11 +13,11 @@
         android:adjustViewBounds="true"
         android:background="@color/riot_primary_background_color_light"
         android:scaleType="centerCrop"
-        tools:src="@drawable/icon_person" />
+        tools:src="@tools:sample/avatars" />
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="?avatar_mask" />
+        android:src="?vctr_avatar_mask" />
 
 </FrameLayout>

@@ -45,7 +45,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import im.vector.R;
-import kotlin.Pair;
+import im.vector.ui.themes.ActivityOtherThemes;
 
 /**
  * This class defines a base class to manage search in action bar
@@ -67,8 +67,8 @@ public abstract class VectorBaseSearchActivity extends MXCActionBarActivity {
 
     @NotNull
     @Override
-    public Pair getOtherThemes() {
-        return new Pair(R.style.SearchesAppTheme_Dark, R.style.SearchesAppTheme_Black);
+    public ActivityOtherThemes getOtherThemes() {
+        return ActivityOtherThemes.Search.INSTANCE;
     }
 
     @Override
@@ -145,10 +145,9 @@ public abstract class VectorBaseSearchActivity extends MXCActionBarActivity {
         mPatternToSearchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if ((actionId == EditorInfo.IME_ACTION_SEARCH) ||
+                if ((actionId == EditorInfo.IME_ACTION_SEARCH)
                         // hardware keyboard : detect the keydown event
-                        ((null != event) && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && (event.getAction() == KeyEvent.ACTION_DOWN))
-                        ) {
+                        || ((null != event) && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && (event.getAction() == KeyEvent.ACTION_DOWN))) {
                     onPatternUpdate(false);
                     return true;
                 }
@@ -213,11 +212,6 @@ public abstract class VectorBaseSearchActivity extends MXCActionBarActivity {
     @Override
     public int getMenuRes() {
         return R.menu.vector_searches;
-    }
-
-    @Override
-    public int getMenuTint() {
-        return R.attr.icon_tint_on_light_action_bar_color;
     }
 
     @Override

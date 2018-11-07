@@ -76,6 +76,7 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import org.jetbrains.annotations.NotNull;
 import org.matrix.androidsdk.MXDataHandler;
+import org.matrix.androidsdk.MXPatterns;
 import org.matrix.androidsdk.MXSession;
 import org.matrix.androidsdk.call.IMXCall;
 import org.matrix.androidsdk.crypto.data.MXDeviceInfo;
@@ -94,6 +95,7 @@ import org.matrix.androidsdk.rest.model.Event;
 import org.matrix.androidsdk.rest.model.MatrixError;
 import org.matrix.androidsdk.util.BingRulesManager;
 import org.matrix.androidsdk.util.Log;
+import org.matrix.androidsdk.util.PermalinkUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -122,20 +124,20 @@ import im.vector.fragments.GroupsFragment;
 import im.vector.fragments.HomeFragment;
 import im.vector.fragments.PeopleFragment;
 import im.vector.fragments.RoomsFragment;
-import im.vector.gcm.GcmRegistrationManager;
+import im.vector.push.PushManager;
 import im.vector.receiver.VectorUniversalLinkReceiver;
 import im.vector.services.EventStreamService;
+import im.vector.ui.themes.ActivityOtherThemes;
+import im.vector.ui.themes.ThemeUtils;
 import im.vector.util.BugReporter;
 import im.vector.util.CallsManager;
 import im.vector.util.HomeRoomsViewModel;
 import im.vector.util.PreferencesManager;
 import im.vector.util.RoomUtils;
 import im.vector.util.SystemUtilsKt;
-import im.vector.util.ThemeUtils;
 import im.vector.util.VectorUtils;
 import im.vector.view.UnreadCounterBadgeView;
 import im.vector.view.VectorPendingCallView;
-import kotlin.Pair;
 
 /**
  * Displays the main screen of the app, with rooms the user has joined and the ability to create
@@ -264,9 +266,6 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
     // the current displayed fragment
     private String mCurrentFragmentTag;
 
-    private List<Room> mDirectChatInvitations;
-    private List<Room> mRoomInvitations;
-
     /*
      * *********************************************************************************************
      * Static methods
@@ -288,8 +287,8 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
 
     @NotNull
     @Override
-    public Pair getOtherThemes() {
-        return new Pair(R.style.HomeActivityTheme_Dark, R.style.HomeActivityTheme_Black);
+    public ActivityOtherThemes getOtherThemes() {
+        return ActivityOtherThemes.Home.INSTANCE;
     }
 
     @Override
@@ -403,13 +402,13 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
                 // detect the room could be opened without waiting the next sync
                 Map<String, String> params = VectorUniversalLinkReceiver.parseUniversalLink(uri);
 
-                if ((null != params) && params.containsKey(VectorUniversalLinkReceiver.ULINK_ROOM_ID_OR_ALIAS_KEY)) {
+                if ((null != params) && params.containsKey(PermalinkUtils.ULINK_ROOM_ID_OR_ALIAS_KEY)) {
                     Log.d(LOG_TAG, "Has a valid universal link");
 
-                    final String roomIdOrAlias = params.get(VectorUniversalLinkReceiver.ULINK_ROOM_ID_OR_ALIAS_KEY);
+                    final String roomIdOrAlias = params.get(PermalinkUtils.ULINK_ROOM_ID_OR_ALIAS_KEY);
 
                     // it is a room ID ?
-                    if (MXSession.isRoomId(roomIdOrAlias)) {
+                    if (MXPatterns.isRoomId(roomIdOrAlias)) {
                         Log.d(LOG_TAG, "Has a valid universal link to the room ID " + roomIdOrAlias);
                         Room room = mSession.getDataHandler().getRoom(roomIdOrAlias, false);
 
@@ -422,7 +421,7 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
                             // wait the next sync
                             intent.putExtra(VectorUniversalLinkReceiver.EXTRA_UNIVERSAL_LINK_URI, uri);
                         }
-                    } else if (MXSession.isRoomAlias(roomIdOrAlias)) {
+                    } else if (MXPatterns.isRoomAlias(roomIdOrAlias)) {
                         Log.d(LOG_TAG, "Has a valid universal link of the room Alias " + roomIdOrAlias);
 
                         showWaitingView();
@@ -529,13 +528,8 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
         Intent intent = getIntent();
 
         if (null != mAutomaticallyOpenedRoomParams) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    CommonActivityUtils.goToRoomPage(VectorHomeActivity.this, mAutomaticallyOpenedRoomParams);
-                    mAutomaticallyOpenedRoomParams = null;
-                }
-            });
+            CommonActivityUtils.goToRoomPage(VectorHomeActivity.this, mSession, mAutomaticallyOpenedRoomParams);
+            mAutomaticallyOpenedRoomParams = null;
         }
 
         // jump to an external link
@@ -605,7 +599,7 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
         // https://github.com/vector-im/vector-android/issues/323
         // the tool bar color is not restored on some devices.
         TypedValue vectorActionBarColor = new TypedValue();
-        getTheme().resolveAttribute(R.attr.riot_primary_background_color, vectorActionBarColor, true);
+        getTheme().resolveAttribute(R.attr.vctr_riot_primary_background_color, vectorActionBarColor, true);
         mToolbar.setBackgroundResource(vectorActionBarColor.resourceId);
 
         checkDeviceId();
@@ -621,12 +615,14 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
         if (resultCode == RESULT_OK) {
             if (requestCode == RequestCodesKt.BATTERY_OPTIMIZATION_REQUEST_CODE) {
                 // Ok, we can set the NORMAL privacy setting
                 Matrix.getInstance(this)
-                        .getSharedGCMRegistrationManager()
-                        .setNotificationPrivacy(GcmRegistrationManager.NotificationPrivacy.NORMAL, null);
+                        .getPushManager()
+                        .setNotificationPrivacy(PushManager.NotificationPrivacy.NORMAL, null);
             }
         }
     }
@@ -640,9 +636,9 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
             return;
         }
 
-        final GcmRegistrationManager gcmMgr = Matrix.getInstance(VectorHomeActivity.this).getSharedGCMRegistrationManager();
+        final PushManager pushManager = Matrix.getInstance(VectorHomeActivity.this).getPushManager();
 
-        if (!gcmMgr.useGCM()) {
+        if (!pushManager.useFcm()) {
             // f-droid does not need the permission.
             // It is still using the technique of sticky "Listen for events" notification
             return;
@@ -655,10 +651,10 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
             if (SystemUtilsKt.isIgnoringBatteryOptimizations(this)) {
                 // No need to ask permission, we already have it
                 // Set the NORMAL privacy setting
-                gcmMgr.setNotificationPrivacy(GcmRegistrationManager.NotificationPrivacy.NORMAL, null);
+                pushManager.setNotificationPrivacy(PushManager.NotificationPrivacy.NORMAL, null);
             } else {
-                // by default, use GCM and low detail notifications
-                gcmMgr.setNotificationPrivacy(GcmRegistrationManager.NotificationPrivacy.LOW_DETAIL, null);
+                // by default, use FCM and low detail notifications
+                pushManager.setNotificationPrivacy(PushManager.NotificationPrivacy.LOW_DETAIL, null);
 
                 new AlertDialog.Builder(this)
                         .setCancelable(false)
@@ -1012,8 +1008,8 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
 
         // Set color of toolbar search view
         EditText edit = mSearchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
-        edit.setTextColor(ThemeUtils.INSTANCE.getColor(this, R.attr.primary_text_color));
-        edit.setHintTextColor(ThemeUtils.INSTANCE.getColor(this, R.attr.primary_hint_text_color));
+        edit.setTextColor(ThemeUtils.INSTANCE.getColor(this, R.attr.vctr_primary_text_color));
+        edit.setHintTextColor(ThemeUtils.INSTANCE.getColor(this, R.attr.vctr_primary_hint_text_color));
     }
 
     /**
@@ -1448,13 +1444,17 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
      */
     private void joinARoom() {
         LayoutInflater inflater = LayoutInflater.from(this);
-
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         View dialogView = inflater.inflate(R.layout.dialog_join_room_by_id, null);
-        alertDialogBuilder.setView(dialogView);
 
         final EditText textInput = dialogView.findViewById(R.id.join_room_edit_text);
-        textInput.setTextColor(ThemeUtils.INSTANCE.getColor(this, R.attr.riot_primary_text_color));
+        textInput.setTextColor(ThemeUtils.INSTANCE.getColor(this, R.attr.vctr_riot_primary_text_color));
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        // set dialog layout
+        alertDialogBuilder
+                .setTitle(R.string.room_recents_join_room_title)
+                .setView(dialogView);
 
         // set dialog message
         AlertDialog alertDialog = alertDialogBuilder
@@ -1514,7 +1514,6 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
                 .show();
 
         final Button joinButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-
         if (null != joinButton) {
             joinButton.setEnabled(false);
             textInput.addTextChangedListener(new TextWatcher() {
@@ -1525,7 +1524,7 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     String text = textInput.getText().toString().trim();
-                    joinButton.setEnabled(MXSession.isRoomId(text) || MXSession.isRoomAlias(text));
+                    joinButton.setEnabled(MXPatterns.isRoomId(text) || MXPatterns.isRoomAlias(text));
                 }
 
                 @Override
@@ -1541,17 +1540,10 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
      * *********************************************************************************************
      */
 
+    @NonNull
     public List<Room> getRoomInvitations() {
-        if (mRoomInvitations == null) {
-            mRoomInvitations = new ArrayList<>();
-        } else {
-            mRoomInvitations.clear();
-        }
-        if (mDirectChatInvitations == null) {
-            mDirectChatInvitations = new ArrayList<>();
-        } else {
-            mDirectChatInvitations.clear();
-        }
+        List<Room> directChatInvitations = new ArrayList<>();
+        List<Room> roomInvitations = new ArrayList<>();
 
         if (null == mSession.getDataHandler().getStore()) {
             Log.e(LOG_TAG, "## getRoomInvitations() : null store");
@@ -1570,9 +1562,9 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
                 // the user conference rooms are not displayed.
                 if (room != null && !room.isConferenceUserRoom() && room.isInvited()) {
                     if (room.isDirectChatInvitation()) {
-                        mDirectChatInvitations.add(room);
+                        directChatInvitations.add(room);
                     } else {
-                        mRoomInvitations.add(room);
+                        roomInvitations.add(room);
                     }
                 }
             }
@@ -1580,20 +1572,20 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
 
         // the invitations are sorted from the oldest to the more recent one
         Comparator<Room> invitationComparator = RoomUtils.getRoomsDateComparator(mSession, true);
-        Collections.sort(mDirectChatInvitations, invitationComparator);
-        Collections.sort(mRoomInvitations, invitationComparator);
+        Collections.sort(directChatInvitations, invitationComparator);
+        Collections.sort(roomInvitations, invitationComparator);
 
         List<Room> roomInvites = new ArrayList<>();
         switch (mCurrentMenuId) {
             case R.id.bottom_action_people:
-                roomInvites.addAll(mDirectChatInvitations);
+                roomInvites.addAll(directChatInvitations);
                 break;
             case R.id.bottom_action_rooms:
-                roomInvites.addAll(mRoomInvitations);
+                roomInvites.addAll(roomInvitations);
                 break;
             default:
-                roomInvites.addAll(mDirectChatInvitations);
-                roomInvites.addAll(mRoomInvitations);
+                roomInvites.addAll(directChatInvitations);
+                roomInvites.addAll(roomInvitations);
                 Collections.sort(roomInvites, invitationComparator);
                 break;
         }
@@ -1603,13 +1595,16 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
 
     public void onPreviewRoom(MXSession session, String roomId) {
         String roomAlias = null;
+        String roomName = null;
 
         Room room = session.getDataHandler().getRoom(roomId);
         if ((null != room) && (null != room.getState())) {
-            roomAlias = room.getState().getAlias();
+            roomAlias = room.getState().getCanonicalAlias();
+            roomName = room.getRoomDisplayName(this);
         }
 
         final RoomPreviewData roomPreviewData = new RoomPreviewData(mSession, roomId, null, roomAlias, null);
+        roomPreviewData.setRoomName(roomName);
         CommonActivityUtils.previewRoom(this, roomPreviewData);
     }
 
@@ -1763,7 +1758,7 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
         });
     }
 
-    void initSlidingMenu() {
+    private void initSlidingMenu() {
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(
                 /* host Activity */
                 this,
@@ -1778,11 +1773,14 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
             @Override
             public void onDrawerClosed(View view) {
                 switch (mSlidingMenuIndex) {
+                    case R.id.sliding_menu_messages: {
+                        // no action
+                        break;
+                    }
+
                     case R.id.sliding_menu_settings: {
                         // launch the settings activity
-                        final Intent settingsIntent = new Intent(VectorHomeActivity.this, VectorSettingsActivity.class);
-                        settingsIntent.putExtra(MXCActionBarActivity.EXTRA_MATRIX_ID, mSession.getMyUserId());
-                        startActivity(settingsIntent);
+                        startActivity(VectorSettingsActivity.getIntent(VectorHomeActivity.this, mSession.getMyUserId()));
                         break;
                     }
 
@@ -1836,6 +1834,12 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
                         break;
                     }
 
+                    case R.id.sliding_menu_version: {
+                        SystemUtilsKt.copyToClipboard(VectorHomeActivity.this,
+                                getString(R.string.room_sliding_menu_version_x, VectorUtils.getApplicationVersion(VectorHomeActivity.this)));
+                        break;
+                    }
+
                     case R.id.sliding_copyright_terms: {
                         VectorUtils.displayAppCopyright();
                         break;
@@ -1881,17 +1885,21 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
         if (null != getSupportActionBar()) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
-            getSupportActionBar().setHomeAsUpIndicator(ThemeUtils.INSTANCE.tintDrawable(this,
-                    ContextCompat.getDrawable(this, R.drawable.ic_material_menu_white), R.attr.primary_control_color));
+            getSupportActionBar().setHomeAsUpIndicator(ContextCompat.getDrawable(this, R.drawable.ic_material_menu_white));
         }
     }
 
     private void refreshSlidingMenu() {
+        if (navigationView == null) {
+            // Activity is not resumed
+            return;
+        }
+
         Menu menuNav = navigationView.getMenu();
         MenuItem aboutMenuItem = menuNav.findItem(R.id.sliding_menu_version);
 
         if (null != aboutMenuItem) {
-            String version = getString(R.string.room_sliding_menu_version) + " " + VectorUtils.getApplicationVersion(this);
+            String version = getString(R.string.room_sliding_menu_version_x, VectorUtils.getApplicationVersion(this));
             aboutMenuItem.setTitle(version);
         }
 
@@ -1900,6 +1908,15 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
 
         if (null != displayNameTextView) {
             displayNameTextView.setText(mSession.getMyUser().displayname);
+
+            displayNameTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Open the settings
+                    mSlidingMenuIndex = R.id.sliding_menu_settings;
+                    mDrawerLayout.closeDrawers();
+                }
+            });
         }
 
         TextView userIdTextView = navigationView.findViewById(R.id.home_menu_main_matrix_id);
@@ -1911,6 +1928,15 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
 
         if (null != mainAvatarView) {
             VectorUtils.loadUserAvatar(this, mSession, mainAvatarView, mSession.getMyUser());
+
+            mainAvatarView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Open the settings
+                    mSlidingMenuIndex = R.id.sliding_menu_settings;
+                    mDrawerLayout.closeDrawers();
+                }
+            });
         } else {
             // on Android M, the mNavigationView is not loaded at launch
             // so launch asap it is rendered.
@@ -1979,11 +2005,11 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
             String eventType = event.getType();
 
             // refresh the UI at the end of the next events chunk
-            mRefreshBadgeOnChunkEnd |= ((event.roomId != null) && RoomSummary.isSupportedEvent(event)) ||
-                    Event.EVENT_TYPE_STATE_ROOM_MEMBER.equals(eventType) ||
-                    Event.EVENT_TYPE_REDACTION.equals(eventType) ||
-                    Event.EVENT_TYPE_TAGS.equals(eventType) ||
-                    Event.EVENT_TYPE_STATE_ROOM_THIRD_PARTY_INVITE.equals(eventType);
+            mRefreshBadgeOnChunkEnd |= ((event.roomId != null) && RoomSummary.isSupportedEvent(event))
+                    || Event.EVENT_TYPE_STATE_ROOM_MEMBER.equals(eventType)
+                    || Event.EVENT_TYPE_REDACTION.equals(eventType)
+                    || Event.EVENT_TYPE_TAGS.equals(eventType)
+                    || Event.EVENT_TYPE_STATE_ROOM_THIRD_PARTY_INVITE.equals(eventType);
 
         }
 
@@ -2103,6 +2129,12 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
                             iconViewLayoutParams.topMargin - badgeOffsetY,
                             iconViewLayoutParams.rightMargin,
                             iconViewLayoutParams.bottomMargin);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                        badgeLayoutParams.setMarginStart(iconViewLayoutParams.leftMargin + badgeOffsetX);
+                        badgeLayoutParams.setMarginEnd(iconViewLayoutParams.rightMargin);
+                    }
+
                     badgeLayoutParams.gravity = iconViewLayoutParams.gravity;
 
                     ((FrameLayout) iconView.getParent()).addView(badgeView, badgeLayoutParams);
@@ -2349,13 +2381,13 @@ public class VectorHomeActivity extends VectorAppCompatActivity implements Searc
                 String eventType = event.getType();
 
                 // refresh the UI at the end of the next events chunk
-                mRefreshOnChunkEnd |= ((event.roomId != null) && RoomSummary.isSupportedEvent(event)) ||
-                        Event.EVENT_TYPE_STATE_ROOM_MEMBER.equals(eventType) ||
-                        Event.EVENT_TYPE_TAGS.equals(eventType) ||
-                        Event.EVENT_TYPE_REDACTION.equals(eventType) ||
-                        Event.EVENT_TYPE_RECEIPT.equals(eventType) ||
-                        Event.EVENT_TYPE_STATE_ROOM_AVATAR.equals(eventType) ||
-                        Event.EVENT_TYPE_STATE_ROOM_THIRD_PARTY_INVITE.equals(eventType);
+                mRefreshOnChunkEnd |= ((event.roomId != null) && RoomSummary.isSupportedEvent(event))
+                        || Event.EVENT_TYPE_STATE_ROOM_MEMBER.equals(eventType)
+                        || Event.EVENT_TYPE_TAGS.equals(eventType)
+                        || Event.EVENT_TYPE_REDACTION.equals(eventType)
+                        || Event.EVENT_TYPE_RECEIPT.equals(eventType)
+                        || Event.EVENT_TYPE_STATE_ROOM_AVATAR.equals(eventType)
+                        || Event.EVENT_TYPE_STATE_ROOM_THIRD_PARTY_INVITE.equals(eventType);
             }
 
             @Override

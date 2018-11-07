@@ -23,6 +23,7 @@ import android.support.annotation.CallSuper
 import android.text.TextUtils
 import im.vector.R
 import im.vector.types.JsonDict
+import im.vector.ui.themes.ActivityOtherThemes
 import im.vector.util.toJsonMap
 import im.vector.widgets.WidgetsManager
 import org.matrix.androidsdk.rest.callback.ApiCallback
@@ -42,7 +43,7 @@ class IntegrationManagerActivity : AbstractWidgetActivity() {
     private var mWidgetId: String? = null
     private var mScreenId: String? = null
 
-    override fun getOtherThemes() = Pair(R.style.AppTheme_NoActionBar_Dark, R.style.AppTheme_NoActionBar_Black)
+    override fun getOtherThemes() = ActivityOtherThemes.NoActionBar
 
     override fun getLayoutRes() = R.layout.activity_integration_manager
 
@@ -160,6 +161,7 @@ class IntegrationManagerActivity : AbstractWidgetActivity() {
 
         Log.d(LOG_TAG, description)
 
+        // FIXME LazyLoading. We cannot rely on getMember nullity anymore
         val member = mRoom!!.getMember(userId)
 
         if (null != member && TextUtils.equals(member.membership, RoomMember.MEMBERSHIP_JOIN)) {
@@ -290,9 +292,7 @@ class IntegrationManagerActivity : AbstractWidgetActivity() {
 
         Log.d(LOG_TAG, "Received request canSendEvent in room " + mRoom!!.roomId)
 
-        val member = mRoom!!.state.getMember(mSession!!.myUserId)
-
-        if (null == member || !TextUtils.equals(RoomMember.MEMBERSHIP_JOIN, member.membership)) {
+        if (!mRoom!!.isJoined) {
             sendError(getString(R.string.widget_integration_must_be_in_room), eventData)
             return
         }
@@ -507,7 +507,7 @@ class IntegrationManagerActivity : AbstractWidgetActivity() {
             return
         }
 
-        sendIntegerResponse(mRoom!!.joinedMembers.size, eventData)
+        sendIntegerResponse(mRoom!!.numberOfJoinedMembers, eventData)
     }
 
     /**

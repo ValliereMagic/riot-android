@@ -11,42 +11,46 @@
         android:layout_height="20dp"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
-        tools:src="@drawable/icon_person" />
+        tools:src="@tools:sample/avatars" />
 
     <im.vector.view.VectorCircularImageView
         android:id="@+id/mels_list_avatar_2"
         android:layout_width="20dp"
         android:layout_height="20dp"
+        android:layout_marginStart="-5dp"
         android:layout_marginLeft="-5dp"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
-        tools:src="@drawable/icon_person" />
+        tools:src="@tools:sample/avatars" />
 
     <im.vector.view.VectorCircularImageView
         android:id="@+id/mels_list_avatar_3"
         android:layout_width="20dp"
         android:layout_height="20dp"
+        android:layout_marginStart="-5dp"
         android:layout_marginLeft="-5dp"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
-        tools:src="@drawable/icon_person" />
+        tools:src="@tools:sample/avatars" />
 
     <im.vector.view.VectorCircularImageView
         android:id="@+id/mels_list_avatar_4"
         android:layout_width="20dp"
         android:layout_height="20dp"
+        android:layout_marginStart="-5dp"
         android:layout_marginLeft="-5dp"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
-        tools:src="@drawable/icon_person" />
+        tools:src="@tools:sample/avatars" />
 
     <im.vector.view.VectorCircularImageView
         android:id="@+id/mels_list_avatar_5"
         android:layout_width="20dp"
         android:layout_height="20dp"
+        android:layout_marginStart="-5dp"
         android:layout_marginLeft="-5dp"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
-        tools:src="@drawable/icon_person" />
+        tools:src="@tools:sample/avatars" />
 
 </LinearLayout>

@@ -30,12 +30,14 @@ import android.webkit.MimeTypeMap;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import im.vector.BuildConfig;
 import im.vector.VectorApp;
+import im.vector.settings.VectorLocale;
 
 public class VectorContentProvider extends ContentProvider {
     private static final String LOG_TAG = VectorContentProvider.class.getSimpleName();
 
-    private static final String AUTHORITIES = "im.vector.VectorApp.provider";
+    private static final String AUTHORITIES = BuildConfig.APPLICATION_ID + ".VectorApp.provider";
 
     private static final String BUG_SEPARATOR = "bugreport";
 
@@ -98,7 +100,7 @@ public class VectorContentProvider extends ContentProvider {
     @Nullable
     public String getType(@NonNull Uri uri) {
         String type = null;
-        String extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString().toLowerCase(VectorApp.getApplicationLocale()));
+        String extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString().toLowerCase(VectorLocale.INSTANCE.getApplicationLocale()));
         if (extension != null) {
             MimeTypeMap mime = MimeTypeMap.getSingleton();
             type = mime.getMimeTypeFromExtension(extension);

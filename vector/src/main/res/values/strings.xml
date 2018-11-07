@@ -10,10 +10,11 @@
     <string name="light_theme">Light Theme</string>
     <string name="dark_theme">Dark Theme</string>
     <string name="black_them">Black Theme</string>
+    <string name="status_theme">Status.im Theme</string>
 
     <!-- permanent notification subtitle -->
     <string name="notification_sync_in_progress">Synchronising</string>
-    <string name="notification_listen_for_events">Listen for events</string>
+    <string name="notification_listening_for_events">Listening for events</string>
     <string name="notification_noisy_notifications">Noisy notifications</string>
     <string name="notification_silent_notifications">Silent notifications</string>
 
@@ -30,7 +31,7 @@
     <string name="dialog_title_third_party_licences">Third party licences</string>
 
     <!-- splash screen accessibility -->
-    <string name="loading">Loading...</string>
+    <string name="loading">Loading…</string>
 
     <!-- button names -->
     <string name="ok">OK</string>
@@ -89,6 +90,7 @@
     <!-- dialog titles -->
     <string name="dialog_title_confirmation">Confirmation</string>
     <string name="dialog_title_warning">Warning</string>
+    <string name="dialog_title_error">Error</string>
 
     <!-- Bottom navigation buttons -->
     <string name="bottom_action_home">Home</string>
@@ -136,7 +138,7 @@
     <string name="send_bug_report_include_logs">Send logs</string>
     <string name="send_bug_report_include_crash_logs">Send crash logs</string>
     <string name="send_bug_report_include_screenshot">Send screenshot</string>
-    <string name="send_bug_report">Bug Report</string>
+    <string name="send_bug_report">Report bug</string>
     <string name="send_bug_report_description">Please describe the bug. What did you do? What did you expect to happen? What actually happened?</string>
     <string name="send_bug_report_description_in_english">If possible, please write the description in English.</string>
     <string name="send_bug_report_placeholder">Describe your problem here</string>
@@ -346,7 +348,7 @@
     <!-- Room -->
     <string name="list_members">List members</string>
     <string name="open_chat_header">Open header</string>
-    <string name="room_sync_in_progress">Syncing...</string>
+    <string name="room_sync_in_progress">Syncing…</string>
     <string name="room_jump_to_first_unread">Jump to first unread message.</string>
 
     <!-- Room Preview -->
@@ -470,7 +472,6 @@
     <string name="room_delete_unsent_messages">Delete unsent messages</string>
     <string name="room_message_file_not_found">File not found</string>
     <string name="room_do_not_have_permission_to_post">You do not have permission to post to this room</string>
-    <string name="room_new_message_notification">1 new message</string>
     <plurals name="room_new_messages_notification">
         <item quantity="one">1 new message</item>
         <item quantity="other">%d new messages</item>
@@ -487,8 +488,7 @@
     <string name="ssl_cert_new_account_expl">If the server administrator has said that this is expected, ensure that the fingerprint below matches the fingerprint provided by them.</string>
     <string name="ssl_unexpected_existing_expl">The certificate has changed from one that was trusted by your phone. This is HIGHLY UNUSUAL. It is recommended that you DO NOT ACCEPT this new certificate.</string>
     <string name="ssl_expected_existing_expl">The certificate has changed from a previously trusted one to one that is not trusted. The server may have renewed its certificate. Contact the server administrator for the expected fingerprint.</string>
-    <string name="ssl_only_accept">ONLY accept the certificate if the server administrator has published a fingerprint that matches the one above.</string>
-    <string name="ssl_fingerprint_example">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</string>
+    <string name="ssl_only_accept">Only accept the certificate if the server administrator has published a fingerprint that matches the one above.</string>
 
     <!-- Room Details -->
     <string name="room_details_title">Room Details</string>
@@ -508,19 +508,6 @@
     <string name="room_event_action_report_prompt_ignore_user">Do you want to hide all messages from this user?\n\nNote that this action will restart the app and it may take some time.</string>
     <string name="room_event_action_cancel_upload">Cancel Upload</string>
     <string name="room_event_action_cancel_download">Cancel Download</string>
-
-    <!-- Room display name -->
-    <string name="room_displayname_invite_from">Invite from %s</string>
-    <string name="room_displayname_room_invite">Room Invite</string>
-    <string name="room_displayname_two_members">%1$s and %2$s</string>
-
-    <string name="room_displayname_many_members">%1$s and %2$s</string>
-    <plurals name="others">
-        <item quantity="one">1 other</item>
-        <item quantity="other">%d others</item>
-    </plurals>
-
-    <string name="room_displayname_no_title">Empty room</string>
 
     <!-- Search -->
     <string name="search_hint">Search</string>
@@ -572,6 +559,7 @@
     <string name="room_sliding_menu_messages">Messages</string>
     <string name="room_sliding_menu_settings">Settings</string>
     <string name="room_sliding_menu_version">Version</string>
+    <string name="room_sliding_menu_version_x">Version %s</string>
     <string name="room_sliding_menu_term_and_conditions">Terms &amp; conditions</string>
     <string name="room_sliding_menu_third_party_notices">Third party notices</string>
     <string name="room_sliding_menu_copyright">Copyright</string>
@@ -596,7 +584,7 @@
     <string name="settings_notification_privacy_reduced">Reduced privacy</string>
     <string name="settings_notification_privacy_need_permission">The app needs permission to run in the background</string>
     <string name="settings_notification_privacy_no_permission">The apps does <b>not</b> need permission to run in the background</string>
-    <string name="settings_notification_privacy_gcm">• Notifications are sent via Google Cloud Messaging</string>
+    <string name="settings_notification_privacy_fcm">• Notifications are sent via Google Cloud Messaging</string>
     <string name="settings_notification_privacy_metadata">• Notifications only contain meta data</string>
     <string name="settings_notification_privacy_secure_message_content">• Message content of the notification is <b>located securely direct from the Matrix homeserver</b></string>
     <string name="settings_notification_privacy_nosecure_message_content">• Notifications contain <b>meta and message data</b></string>
@@ -669,8 +657,6 @@
 
     <!-- analytics -->
     <string name="settings_analytics">Analytics</string>
-    <string name="settings_opt_out_of_analytics">Opt out of analytics</string>
-    <string name="settings_opt_out_of_analytics_summary">Riot collects anonymous analytics to allow us to improve the application.</string>
     <string name="settings_opt_in_of_analytics">Send analytics data</string>
     <string name="settings_opt_in_of_analytics_summary">Riot collects anonymous analytics to allow us to improve the application.</string>
     <string name="settings_opt_in_of_analytics_prompt">Please enable analytics to help us improve Riot.</string>
@@ -684,7 +670,6 @@
     <string name="devices_details_device_name">Device Name</string>
     <string name="devices_details_last_seen_title">Last seen</string>
     <string name="devices_details_last_seen_format">%1$s @ %2$s</string>
-    <string name="devices_details_time_format">HH:mm:ss</string>
     <string name="devices_delete_dialog_text">This operation requires additional authentication.\nTo continue, please enter your password.</string>
     <string name="devices_delete_dialog_title">Authentication</string>
     <string name="devices_delete_pswd">Password:</string>
@@ -706,9 +691,9 @@
     <string name="account_phone_number_already_used_error">This phone number is already in use</string>
 
     <string name="settings_change_password">Change password</string>
-    <string name="settings_old_password">old password</string>
-    <string name="settings_new_password">new password</string>
-    <string name="settings_confirm_password">confirm password</string>
+    <string name="settings_old_password">Old password</string>
+    <string name="settings_new_password">New password</string>
+    <string name="settings_confirm_password">Confirm password</string>
     <string name="settings_fail_to_update_password">Fail to update password</string>
     <string name="settings_password_updated">Your password has been updated</string>
     <string name="settings_unignore_user">Show all messages from %s?\n\nNote that this action will restart the app and it may take some time.</string>
@@ -753,9 +738,6 @@
     <string name="room_settings_tag_pref_entry_low_priority">Low priority</string>
     <string name="room_settings_tag_pref_entry_none">None</string>
     <string name="room_settings_tag_pref_no_tag">not tagged</string>
-    <string name="room_settings_tag_pref_entry_value_favourite">favourite</string>
-    <string name="room_settings_tag_pref_entry_value_low_priority">low</string>
-    <string name="room_settings_tag_pref_entry_value_none">none</string>
 
     <!-- room settings : access and visibility -->
     <string name="room_settings_category_access_visibility_title">Access and visibility</string>
@@ -805,7 +787,7 @@
 
     <string name="room_settings_addresses_invalid_format_dialog_title">Invalid alias format</string>
     <string name="room_settings_addresses_invalid_format_dialog_body">\'%s\' is not a valid format for an alias</string>
-    <string name="room_settings_addresses_disable_main_address_prompt_msg">You will have no main address specified. The default main address for this room will be picked randomly"</string>
+    <string name="room_settings_addresses_disable_main_address_prompt_msg">You will have no main address specified for this room."</string>
     <string name="room_settings_addresses_disable_main_address_prompt_title">Main address warnings</string>
 
     <string name="room_settings_set_main_address">Set as Main Address</string>
@@ -849,14 +831,17 @@
     <string name="encryption_export_room_keys">Export room keys</string>
     <string name="encryption_export_room_keys_summary">Export the keys to a local file</string>
     <string name="encryption_export_export">Export</string>
-    <string name="encryption_export_enter_passphrase">Enter passphrase</string>
+    <string name="encryption_export_notice">Please create a passphrase to encrypt the exported keys. You will need to enter the same passphrase to be able to import the keys.</string>
+    <string name="encryption_export_create_passphrase">Create passphrase</string>
     <string name="encryption_export_confirm_passphrase">Confirm passphrase</string>
+    <string name="encryption_export_passphrase_dont_match">Passphrases must match</string>
     <string name="encryption_export_saved_as">The E2E room keys have been saved to \'%s\'.\n\nWarning: this file may be deleted if the application is uninstalled.</string>
 
     <string name="encryption_import_e2e_room_keys">Import E2E room keys</string>
     <string name="encryption_import_room_keys">Import room keys</string>
     <string name="encryption_import_room_keys_summary">Import the keys from a local file</string>
     <string name="encryption_import_import">Import</string>
+    <string name="encryption_import_enter_passphrase">Enter passphrase</string>
     <string name="encryption_never_send_to_unverified_devices_title">Encrypt to verified devices only</string>
     <string name="encryption_never_send_to_unverified_devices_summary">Never send encrypted messages to unverified devices from this device</string>
 
@@ -874,7 +859,7 @@
 
     <string name="encryption_information_verify_device">Verify device</string>
     <string name="encryption_information_verify_device_warning">To verify that this device can be trusted, please contact its owner using some other means (e.g. in person or a phone call) and ask them whether the key they see in their User Settings for this device matches the key below:</string>
-    <string name="encryption_information_verify_device_warning2">If it matches, press the verify button below. \nIf it doesn\'t, then someone else is intercepting this device and you should probably blacklist it.\nIn future this verification process will be more sophisticated.</string>
+    <string name="encryption_information_verify_device_warning2">If it matches, press the verify button below. If it doesn\'t, then someone else is intercepting this device and you should probably blacklist it. In the future this verification process will be more sophisticated.</string>
     <string name="encryption_information_verify_key_match">I verify that the keys match</string>
 
     <string name="e2e_enabling_on_app_update">Riot now supports end-to-end encryption but you need to log in again to enable it.\n\nYou can do it now or later from the application settings.</string>
@@ -945,7 +930,6 @@
     <string name="widget_integration_room_not_visible">Room %s is not visible.</string>
     <string name="widget_integration_missing_parameter">A required parameter is missing.</string>
     <string name="widget_integration_invalid_parameter">A parameter is not valid.</string>
-    <string name="settings_labs_matrix_apps">Matrix Apps</string>
     <string name="room_add_matrix_apps">Add Matrix apps</string>
     <string name="settings_labs_native_camera">Use native camera</string>
     <string name="settings_labs_keyboard_options_to_send_message">Use keyboard enter key to send message</string>
@@ -1023,7 +1007,7 @@
     <string name="rejoin">Rejoin</string>
     <string name="forget_room">Forget room</string>
 
-    <!-- Miscelaneous image descriptions for accessibility -->
+    <!-- Miscellaneous image descriptions for accessibility -->
     <string name="receipt_avatar">Receipt avatar</string>
     <string name="notice_avatar">Notice avatar</string>
     <string name="avatar">Avatar</string>
@@ -1062,5 +1046,27 @@
     <string name="resource_limit_soft_contact">"Please %s to get this limit increased."</string>
     <!-- Parameter %s will be replaced by the value of string resource_limit_contact_admin -->
     <string name="resource_limit_hard_contact">"Please %s to continue using this service."</string>
+
+    <!-- Lazy loading -->
+    <string name="settings_lazy_loading_title">Lazy load rooms members</string>
+    <string name="settings_lazy_loading_description">Increase performance by only loading room members on first view</string>
+    <string name="error_lazy_loading_not_supported_by_home_server">Your homeserver does not support lazy loading of room members yet. Try later.</string>
+
+    <!-- Other errors -->
+    <string name="unknown_error">Sorry, an error occurred</string>
+
+    <!-- Expand/Collapse room member changes -->
+    <string name="merged_events_expand">expand</string>
+    <string name="merged_events_collapse">collapse</string>
+
+    <string name="settings_info_area_show">Show the info area</string>
+    <string name="show_info_area_always">Always</string>
+    <string name="show_info_area_messages_and_errors">For messages and errors</string>
+    <string name="show_info_area_only_errors">Only for errors</string>
+
+    <string name="generic_label">%1$s:</string>
+    <string name="generic_label_and_value">%1$s: %2$s</string>
+    <string name="plus_x">+%d</string>
+    <string name="x_plus">%d+</string>
 
 </resources>

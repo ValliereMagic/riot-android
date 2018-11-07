@@ -28,7 +28,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.matrix.androidsdk.MXSession;
+import org.matrix.androidsdk.MXPatterns;
 import org.matrix.androidsdk.data.Room;
 import org.matrix.androidsdk.rest.callback.SimpleApiCallback;
 import org.matrix.androidsdk.rest.model.User;
@@ -41,8 +41,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import im.vector.R;
-import im.vector.VectorApp;
 import im.vector.contacts.ContactsManager;
+import im.vector.settings.VectorLocale;
 import im.vector.util.RoomUtils;
 import im.vector.util.VectorUtils;
 
@@ -265,7 +265,7 @@ public class PeopleAdapter extends AbsAdapter {
     private int filterLocalContacts(final String pattern) {
         if (!TextUtils.isEmpty(pattern)) {
             List<ParticipantAdapterItem> filteredLocalContacts = new ArrayList<>();
-            final String formattedPattern = pattern.toLowerCase(VectorApp.getApplicationLocale()).trim();
+            final String formattedPattern = pattern.toLowerCase(VectorLocale.INSTANCE.getApplicationLocale()).trim();
 
             List<ParticipantAdapterItem> sectionItems = new ArrayList<>(mLocalContactsSection.getItems());
             for (final ParticipantAdapterItem item : sectionItems) {
@@ -300,7 +300,7 @@ public class PeopleAdapter extends AbsAdapter {
     private int filterKnownContacts(final String pattern) {
         List<ParticipantAdapterItem> filteredKnownContacts = new ArrayList<>();
         if (!TextUtils.isEmpty(pattern)) {
-            final String formattedPattern = pattern.trim().toLowerCase(VectorApp.getApplicationLocale());
+            final String formattedPattern = pattern.trim().toLowerCase(VectorLocale.INSTANCE.getApplicationLocale());
             List<ParticipantAdapterItem> sectionItems = new ArrayList<>(mKnownContactsSection.getItems());
             for (final ParticipantAdapterItem item : sectionItems) {
                 if (item.startsWith(formattedPattern)) {
@@ -378,7 +378,7 @@ public class PeopleAdapter extends AbsAdapter {
              * For other contacts, it is the presence
              */
             if (participant.mContact != null) {
-                boolean isMatrixUserId = MXSession.PATTERN_CONTAIN_MATRIX_USER_IDENTIFIER.matcher(participant.mUserId).matches();
+                boolean isMatrixUserId = MXPatterns.isUserId(participant.mUserId);
                 vContactBadge.setVisibility(isMatrixUserId ? View.VISIBLE : View.GONE);
 
                 if (participant.mContact.getEmails().size() > 0) {
